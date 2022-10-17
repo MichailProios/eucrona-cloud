@@ -1,0 +1,12 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "cockroachdb"
+  url      = "prisma://aws-us-east-1.prisma-data.com/?api_key=duul0SNSKnBmy6VZabYYK263UL-D3AYmk6l6ei4NQtCPX5zfT6YzK5wlA3mqoHsu"
+}
+
+model test {
+  name String @id @default("")
+}
