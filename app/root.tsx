@@ -20,7 +20,6 @@ import type { MetaFunction, LinksFunction } from "@remix-run/cloudflare";
 import { ServerStyleContext, ClientStyleContext } from "~/styles/context";
 
 import Navbar from "app/components/Navbar";
-import NotFound from "app/components/NotFound";
 
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
@@ -173,44 +172,44 @@ export default function App() {
   );
 }
 
-export function ErrorBoundary({ error }: { error: Error }) {
-  let cookies = "";
+// export function ErrorBoundary({ error }: { error: Error }) {
+//   let cookies = "";
 
-  return (
-    <Document>
-      <ChakraProvider
-        theme={theme}
-        colorModeManager={
-          cookies.length > 0
-            ? cookieStorageManagerSSR(cookies)
-            : localStorageManager
-        }
-      >
-        <Navbar cookies={cookies}>
-          <NotFound />
-        </Navbar>
-      </ChakraProvider>
-    </Document>
-  );
-}
+//   return (
+//     <Document>
+//       <ChakraProvider
+//         theme={theme}
+//         colorModeManager={
+//           cookies.length > 0
+//             ? cookieStorageManagerSSR(cookies)
+//             : localStorageManager
+//         }
+//       >
+//         <Navbar cookies={cookies}>
+//           <NotFound />
+//         </Navbar>
+//       </ChakraProvider>
+//     </Document>
+//   );
+// }
 
-export function CatchBoundary() {
-  let cookies = "";
+// export function CatchBoundary() {
+//   let cookies = "";
 
-  return (
-    <Document>
-      <ChakraProvider
-        theme={theme}
-        colorModeManager={
-          cookies.length > 0
-            ? cookieStorageManagerSSR(cookies)
-            : localStorageManager
-        }
-      >
-        <Navbar cookies={cookies}>
-          <NotFound />
-        </Navbar>
-      </ChakraProvider>
-    </Document>
-  );
-}
+//   return (
+//     <Document>
+//       <ChakraProvider
+//         theme={theme}
+//         colorModeManager={
+//           cookies.length > 0
+//             ? cookieStorageManagerSSR(cookies)
+//             : localStorageManager
+//         }
+//       >
+//         <Navbar cookies={cookies}>
+//           <NotFound />
+//         </Navbar>
+//       </ChakraProvider>
+//     </Document>
+//   );
+// }
