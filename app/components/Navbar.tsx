@@ -16,8 +16,7 @@ import { useLoaderData } from "@remix-run/react";
 
 import { MoonIcon, SunIcon } from "@chakra-ui/icons";
 
-import logo from "public/logos/Logo-Sideways-Large-No-Padding.svg";
-import logoDark from "public/logos/Logo-Sideways-Large-No-Padding-DarkMode.svg";
+import logo from "public/logos/Logo-Sideways.svg";
 
 interface NavbarProps {
   children: ReactNode;
@@ -55,13 +54,13 @@ export default function Navbar({ children, cookies }: NavbarProps) {
           w={"100%"}
           maxW={"1400px"}
         >
-          <Link href="https://pulsetrail.com">
+          <Link href="https://eucrona.com">
             <Image
               objectFit="contain"
-              h={55}
+              h={50}
               w={"auto"}
-              src={colorMode === "light" ? logo : logoDark}
-              alt="PulseTrail-Sideways"
+              src={logo}
+              alt="Eucrona-Logo"
               draggable="false"
             />
           </Link>
