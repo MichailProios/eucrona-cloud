@@ -1,7 +1,9 @@
 node_modules
 
 /.cache
-/functions/\[\[path\]\].js
-/functions/\[\[path\]\].js.map
+/server/index.js
 /public/build
+preferences.arc
+sam.json
+sam.yaml
 .env

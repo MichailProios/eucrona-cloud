@@ -4,19 +4,38 @@
 
 ## Development
 
-You will be utilizing Wrangler for local development to emulate the Cloudflare runtime. This is already wired up in your package.json as the `dev` script:
+The following command will run two processes during development when using Architect as your server.
+
+- Your Architect server sandbox
+- The Remix development server
 
 ```sh
-# start the remix dev server and wrangler
-npm run dev
+$ npm run dev
 ```
 
-Open up [http://127.0.0.1:8788](http://127.0.0.1:8788) and you should be ready to go!
+Your file changes are watched, and assets are rebuilt upon change.
 
-## Deployment
+Open up [http://localhost:3333](http://localhost:3333) and you should be ready to go!
 
-Cloudflare Pages are currently only deployable through their Git provider integrations.
+## Deploying
 
-If you don't already have an account, then [create a Cloudflare account here](https://dash.cloudflare.com/sign-up/pages) and after verifying your email address with Cloudflare, go to your dashboard and follow the [Cloudflare Pages deployment guide](https://developers.cloudflare.com/pages/framework-guides/deploy-anything).
+Before you can deploy, you'll need to do some setup with AWS:
 
-Configure the "Build command" should be set to `npm run build`, and the "Build output directory" should be set to `public`.
+- First [install the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
+- Then [follow the Architect setup instructions](https://arc.codes/docs/en/guides/get-started/detailed-aws-setup).
+
+If you make it through all of that, you're ready to deploy!
+
+1. build the app for production:
+
+   ```sh
+   npm run build
+   ```
+
+2. Deploy with `arc`
+
+   ```sh
+   arc deploy production
+   ```
+
+You're in business!

@@ -1,11 +1,12 @@
+// entry.server.tsx
 import { renderToString } from "react-dom/server";
 import { CacheProvider } from "@emotion/react";
 import createEmotionServer from "@emotion/server/create-instance";
 import { RemixServer } from "@remix-run/react";
-import type { EntryContext } from "@remix-run/cloudflare";
+import type { EntryContext } from "@remix-run/node"; // Depends on the runtime you choose
 
-import { ServerStyleContext } from "./styles/context";
-import createEmotionCache from "./styles/createEmotionCache";
+import { ServerStyleContext } from "app/styles/context";
+import createEmotionCache from "app/styles/createEmotionCache";
 
 export default function handleRequest(
   request: Request,
