@@ -17,7 +17,7 @@ import { animateScroll as scroll } from "react-scroll";
 
 import ExecutionEnvironment from "exenv";
 
-import Navbar from "app/components/Navbar";
+// import Navbar from "app/components/Navbar";
 import Footer from "app/components/Footer";
 
 import { FaGithub, FaLinkedin } from "react-icons/fa";
@@ -82,10 +82,10 @@ export default function Layout({ children }: LayoutProps) {
       flexDirection={"column"}
       justifyContent="flex-start"
     >
-      <Navbar
+      {/* <Navbar
         navigationLinks={navigationLinks}
         eucronaAccounts={eucronaAccounts}
-      />
+      /> */}
 
       <Box display={{ base: "none", md: "flex" }}>
         <Fade in={showButton} unmountOnExit style={{ zIndex: 1000 }}>
@@ -109,13 +109,13 @@ export default function Layout({ children }: LayoutProps) {
       </Box>
 
       <Box>{children}</Box>
-      <Box marginTop={"auto"}>
+      {/* <Box marginTop={"auto"}>
         <Divider />
         <Footer
           navigationLinks={navigationLinks}
           eucronaAccounts={eucronaAccounts}
         />
-      </Box>
+      </Box> */}
     </Box>
   );
 }

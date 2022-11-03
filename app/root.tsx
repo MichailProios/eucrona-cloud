@@ -1,8 +1,11 @@
 import React, { useContext, useEffect } from "react";
 import { withEmotionCache } from "@emotion/react";
-import { ChakraProvider, ColorModeScript } from "@chakra-ui/react";
+import { ChakraProvider } from "@chakra-ui/react";
+import { redirect } from "@remix-run/node";
 
-import { useCatch } from "@remix-run/react";
+import { useCatch, useLoaderData } from "@remix-run/react";
+
+import type { LoaderFunction } from "@remix-run/node";
 
 import {
   Links,
@@ -26,6 +29,8 @@ import global from "app/styles/global.css";
 import favicon from "public/favicon.ico";
 import LogoPlain from "public/logos/Logo-Plain.svg";
 import LogoSideways from "public/logos/Logo-Sideways.svg";
+
+import * as utils from "app/utils/auth.server";
 
 export const meta: MetaFunction = () => ({
   charset: "utf-8",

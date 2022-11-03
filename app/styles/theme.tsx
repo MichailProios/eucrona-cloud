@@ -16,7 +16,7 @@ const colors = {
 };
 
 const config = {
-  initialColorMode: "light",
+  initialColorMode: "dark",
 };
 
 const components = {};
