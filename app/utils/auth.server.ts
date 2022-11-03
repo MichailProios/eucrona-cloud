@@ -7,9 +7,9 @@ import {
 
 import { redirect, createCookieSessionStorage } from "@remix-run/node";
 
-const userPoolId = process.env.CONGITO_USERPOOL_ID;
-const clientId = process.env.CONGITO_CLIENT_ID;
-const sessionSecret = process.env.SESSION_SECRET;
+const userPoolId = process.env.COGNITO_USERPOOL_ID;
+const clientId = process.env.COGNITO_CLIENT_ID;
+const sessionSecret = process.env.COGNITO_SESSION_SECRET;
 
 if (!sessionSecret || !userPoolId || !clientId) {
   throw new Error("Env missing configuration");
