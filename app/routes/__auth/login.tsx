@@ -13,12 +13,14 @@ import {
   InputGroup,
   InputRightElement,
   Checkbox,
-  Link,
   FormErrorMessage,
   Textarea,
+  Text,
 } from "@chakra-ui/react";
 
 import type { LoaderFunction } from "@remix-run/node";
+
+import { Link, useMatches } from "@remix-run/react";
 import {
   ValidatedForm,
   validationError,
@@ -226,9 +228,9 @@ export default function Login() {
                 <Checkbox colorScheme="green" size="md">
                   Remember me
                 </Checkbox>
-                <Link fontSize={{ base: "md", sm: "md" }}>
+                <Text as={Link} to="/login" fontSize={{ base: "md", sm: "md" }}>
                   Forgot password?
-                </Link>
+                </Text>
               </Stack>
               {/* <Button
                 bg="green.300"
@@ -246,6 +248,14 @@ export default function Login() {
                 label="Sign In"
                 type="submit"
               />
+
+              <Text
+                as={Link}
+                to="/register"
+                fontSize={{ base: "md", sm: "md" }}
+              >
+                Register
+              </Text>
             </VStack>
           </VStack>
         </Stack>
