@@ -16,11 +16,17 @@ import {
   FormErrorMessage,
   Textarea,
   Text,
+  Alert,
+  AlertIcon,
+  AlertTitle,
+  AlertDescription,
 } from "@chakra-ui/react";
 
 import type { LoaderFunction } from "@remix-run/node";
 
-import { Link, useMatches } from "@remix-run/react";
+import { redirect } from "@remix-run/node";
+
+import { Link, useLoaderData } from "@remix-run/react";
 import {
   ValidatedForm,
   validationError,
@@ -31,7 +37,7 @@ import { withZod } from "@remix-validated-form/with-zod";
 import { z } from "zod";
 
 import * as auth from "app/utils/auth.server";
-import { useActionData, useLoaderData } from "@remix-run/react";
+import { useActionData } from "@remix-run/react";
 
 export const validator = withZod(
   z.object({
@@ -42,6 +48,8 @@ export const validator = withZod(
     password: z
       .string()
       .min(8, { message: "Password must be at least 8 characters" }),
+
+    remember: z.any(),
   })
 );
 
@@ -78,6 +86,25 @@ export const validator = withZod(
 //   return "s";
 // };
 
+export const loader: LoaderFunction = async ({ request }: any) => {
+  try {
+    const res = await auth.unprotectedRoute(request);
+
+    if (!res) {
+      const url = new URL(request.url);
+      const loginInstructions: any = url.searchParams.get(
+        "verificationSuccessful"
+      );
+
+      return loginInstructions;
+    }
+
+    return res;
+  } catch (error) {
+    return error;
+  }
+};
+
 export async function action({ request }: { request: Request }) {
   const data = await validator.validate(await request.formData());
 
@@ -85,29 +112,40 @@ export async function action({ request }: { request: Request }) {
     return validationError(data.error);
   }
 
-  const { emailAddress, password } = data.data;
+  const { emailAddress, password, remember } = data.data;
 
   try {
-    const res = await auth.signIn(request, emailAddress, password);
-
-    return res;
-  } catch (error) {
-    return "Incorrect Password";
+    return await auth.signIn(
+      request,
+      emailAddress,
+      password,
+      remember ? true : false
+    );
+  } catch (error: any) {
+    if (error.name && error.message) {
+      return {
+        res: { name: error.name, message: error.message, formData: data.data },
+      };
+    } else {
+      return {
+        res: {
+          name: "unknownException",
+          message: "Unknown exception",
+          formData: data.data,
+        },
+      };
+    }
   }
 }
 
 function EmailTextField(props: any) {
   const { error, getInputProps } = useField(props.name);
-  const actionData = useActionData();
+  const isSubmitting = useIsSubmitting();
 
   return (
     <FormControl id={props.name} isInvalid={error ? true : false}>
       <FormLabel>{props.label}</FormLabel>
-      <Input
-        {...props}
-        {...getInputProps()}
-        disabled={actionData === "success"}
-      />
+      <Input {...props} {...getInputProps()} readOnly={isSubmitting} />
       <FormErrorMessage>{error}</FormErrorMessage>
     </FormControl>
   );
@@ -117,7 +155,7 @@ function PasswordTextField(props: any) {
   const [show, setShow] = useState(false);
   const handleClick = () => setShow(!show);
   const { error, getInputProps } = useField(props.name);
-  const actionData = useActionData();
+  const isSubmitting = useIsSubmitting();
 
   return (
     <FormControl id={props.name} isInvalid={error ? true : false}>
@@ -126,7 +164,7 @@ function PasswordTextField(props: any) {
         <Input
           {...props}
           {...getInputProps()}
-          // disabled={actionData === "success"}
+          readOnly={isSubmitting}
           type={show ? "text" : "password"}
         />
         <InputRightElement width="4.5rem">
@@ -138,6 +176,7 @@ function PasswordTextField(props: any) {
             _hover={{
               bg: useColorModeValue("gray.400", "gray.800"),
             }}
+            disabled={isSubmitting}
             onClick={handleClick}
           >
             {show ? "Hide" : "Show"}
@@ -151,15 +190,14 @@ function PasswordTextField(props: any) {
 
 function CheckBox(props: any) {
   const { getInputProps } = useField(props.name);
-  const actionData = useActionData();
+  const isSubmitting = useIsSubmitting();
 
   return (
     <Checkbox
       {...props}
       {...getInputProps()}
-      defaultChecked
       value={"yes"}
-      // disabled={actionData === "success"}
+      readOnly={isSubmitting}
     >
       {props.label}
     </Checkbox>
@@ -168,15 +206,9 @@ function CheckBox(props: any) {
 
 function SubmitButton(props: any) {
   const isSubmitting = useIsSubmitting();
-  const actionData = useActionData();
 
   return (
-    <Button
-      {...props}
-      isLoading={isSubmitting}
-      loadingText="Signing In"
-      // disabled={actionData === "success" || isSubmitting}
-    >
+    <Button {...props} isLoading={isSubmitting} loadingText="Signing In">
       {props.label}
     </Button>
   );
@@ -184,6 +216,14 @@ function SubmitButton(props: any) {
 
 export default function Login() {
   const actionData = useActionData();
+  const loaderData = useLoaderData();
+  console.log(loaderData);
+
+  if (loaderData !== null) {
+    console.log("yes");
+  } else {
+    console.log("no");
+  }
 
   return (
     <Container maxW="7xl" p={{ base: 5, md: 10 }}>
@@ -194,6 +234,7 @@ export default function Login() {
           validator={validator}
           method="post"
           id="loginForm"
+          replace
         >
           <Stack align="center">
             <Heading fontSize="2xl">Sign in to your account</Heading>
@@ -202,8 +243,8 @@ export default function Login() {
             boxSize={{ base: "xs", sm: "sm", md: "md" }}
             h="max-content !important"
             bg={useColorModeValue("white", "gray.700")}
-            rounded="lg"
-            boxShadow="lg"
+            rounded="xl"
+            boxShadow={"2xl"}
             p={{ base: 5, sm: 10 }}
             spacing={8}
           >
@@ -222,26 +263,39 @@ export default function Login() {
                 placeholder="Enter your password"
                 rounded="md"
               />
+              {actionData?.res && (
+                <Alert status="error" rounded="md">
+                  <AlertIcon />
+                  <AlertTitle>{actionData?.res?.message}</AlertTitle>
+                </Alert>
+              )}
+              {loaderData !== null && (
+                <Alert status="success" rounded="md">
+                  <AlertIcon />
+                  <AlertTitle>
+                    Account verification successful! Please login with your
+                    credentials.
+                  </AlertTitle>
+                </Alert>
+              )}
             </VStack>
-            <VStack w="100%">
+            <VStack w="100%" spacing={4}>
               <Stack direction="row" justify="space-between" w="100%">
-                <Checkbox colorScheme="green" size="md">
+                {/* <Checkbox colorScheme="primary" size="md">
                   Remember me
-                </Checkbox>
-                <Text as={Link} to="/login" fontSize={{ base: "md", sm: "md" }}>
-                  Forgot password?
+                </Checkbox> */}
+                <CheckBox type="checkbox" name="remember" label="Remember me" />
+                <Text
+                  as={Link}
+                  to="/forgot"
+                  fontSize={{ base: "md", sm: "md" }}
+                  // fontWeight="bold"
+                  _hover={{ textDecoration: "underline" }}
+                >
+                  Forgot Password?
                 </Text>
               </Stack>
-              {/* <Button
-                bg="green.300"
-                color="white"
-                _hover={{
-                  bg: "green.500",
-                }}
-                rounded="md"
-              >
-                Sign in
-              </Button> */}
+
               <SubmitButton
                 w="100%"
                 colorScheme="primary"
@@ -249,12 +303,17 @@ export default function Login() {
                 type="submit"
               />
 
-              <Text
-                as={Link}
-                to="/register"
-                fontSize={{ base: "md", sm: "md" }}
-              >
-                Register
+              <Text>
+                Don't have an account?&nbsp;
+                <Text
+                  as={Link}
+                  to="/register"
+                  fontSize={{ base: "md", sm: "md" }}
+                  fontWeight="bold"
+                  _hover={{ textDecoration: "underline" }}
+                >
+                  Register
+                </Text>
               </Text>
             </VStack>
           </VStack>

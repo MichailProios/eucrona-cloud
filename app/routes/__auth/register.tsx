@@ -66,6 +66,8 @@ export const validator = withZod(
           "Password must contain at least one uppercase, one lowercase, one number, and one special character",
       })
       .trim(),
+
+    agreed: z.any(),
   })
 );
 
@@ -109,49 +111,74 @@ export async function action({ request }: { request: Request }) {
     return validationError(data.error);
   }
 
-  const { fullName, emailAddress, password, confirmPassword } = data.data;
+  const { fullName, emailAddress, password, confirmPassword, agreed } =
+    data.data;
 
   try {
     if (password !== confirmPassword) {
-      console.log("here");
-      return "passwordMismatch";
+      return {
+        res: {
+          name: "passwordMismatch",
+          message: "Passwords do not match.",
+          formData: data.data,
+        },
+      };
     }
-
-    console.log(fullName, emailAddress, password, confirmPassword);
+    if (!agreed) {
+      return {
+        res: {
+          name: "notAgreed",
+          message:
+            "You must agree to the Terms & Conditions before registering.",
+          formData: data.data,
+        },
+      };
+    }
 
     await auth.signUp(emailAddress, fullName, password);
 
     return redirect(`/verify?emailAddress=${emailAddress}`);
   } catch (error: any) {
-    if (error.name === "UsernameExistsException") {
-      return "accountExists";
+    if (error.name && error.message) {
+      return {
+        res: { name: error.name, message: error.message, formData: data.data },
+      };
+    } else {
+      return {
+        res: {
+          name: "unknownException",
+          message: "Unknown exception",
+          formData: data.data,
+        },
+      };
     }
-    return "unknownError";
   }
 }
 
+export const loader: LoaderFunction = async ({ request }: any) => {
+  try {
+    return await auth.unprotectedRoute(request);
+  } catch (error) {
+    return error;
+  }
+};
+
 function TextField(props: any) {
   const { error, getInputProps } = useField(props.name);
-  const actionData = useActionData();
+  const isSubmitting = useIsSubmitting();
 
   return (
     <FormControl id={props.name} isInvalid={error ? true : false}>
       <FormLabel>{props.label}</FormLabel>
-      <Input
-        {...props}
-        {...getInputProps()}
-        disabled={actionData === "success"}
-      />
+      <Input {...props} {...getInputProps()} isReadOnly={isSubmitting} />
       <FormErrorMessage>{error}</FormErrorMessage>
     </FormControl>
   );
 }
 
 function PasswordTextField(props: any) {
-  //   const [show, setShow] = useState(false);
-  //   const handleClick = () => setShow(!show);
   const { error, getInputProps } = useField(props.name);
-  const actionData = useActionData();
+  const isSubmitting = useIsSubmitting();
 
   return (
     <FormControl id={props.name} isInvalid={error ? true : false}>
@@ -160,23 +187,9 @@ function PasswordTextField(props: any) {
         <Input
           {...props}
           {...getInputProps()}
-          // disabled={actionData === "success"}
+          isReadOnly={isSubmitting}
           type={"password"}
         />
-        {/* <InputRightElement width="4.5rem">
-          <Button
-            h="1.75rem"
-            size="sm"
-            rounded="md"
-            bg={useColorModeValue("gray.300", "gray.700")}
-            _hover={{
-              bg: useColorModeValue("gray.400", "gray.800"),
-            }}
-            onClick={handleClick}
-          >
-            {show ? "Hide" : "Show"}
-          </Button>
-        </InputRightElement> */}
       </InputGroup>
       <FormErrorMessage>{error}</FormErrorMessage>
     </FormControl>
@@ -185,15 +198,14 @@ function PasswordTextField(props: any) {
 
 function CheckBox(props: any) {
   const { getInputProps } = useField(props.name);
-  const actionData = useActionData();
+  const isSubmitting = useIsSubmitting();
 
   return (
     <Checkbox
       {...props}
       {...getInputProps()}
-      defaultChecked
       value={"yes"}
-      // disabled={actionData === "success"}
+      isReadOnly={isSubmitting}
     >
       {props.label}
     </Checkbox>
@@ -219,8 +231,6 @@ function SubmitButton(props: any) {
 export default function Register() {
   const actionData = useActionData();
 
-  console.log(actionData);
-
   return (
     <Container maxW="7xl" p={{ base: 5, md: 10 }}>
       <Center>
@@ -230,20 +240,20 @@ export default function Register() {
           validator={validator}
           method="post"
           id="registerForm"
+          replace
         >
+          <Stack align="center">
+            <Heading fontSize="2xl">Create Account</Heading>
+          </Stack>
           <VStack
             boxSize={{ base: "xs", sm: "sm", md: "md" }}
             h="max-content !important"
             bg={useColorModeValue("white", "gray.700")}
-            rounded="lg"
-            boxShadow="lg"
+            rounded="xl"
+            boxShadow={"2xl"}
             p={{ base: 5, sm: 10 }}
             spacing={8}
           >
-            <Stack align="center">
-              <Heading fontSize="2xl">Create Account</Heading>
-            </Stack>
-
             <VStack spacing={4} w="100%">
               <TextField
                 label="Full Name"
@@ -273,39 +283,29 @@ export default function Register() {
                 rounded="md"
               />
 
-              {actionData === "passwordMismatch" && (
+              {actionData?.res && (
                 <Alert status="error" rounded="md">
                   <AlertIcon />
-                  <AlertTitle>Passwords do not match</AlertTitle>
+                  <AlertTitle>{actionData?.res?.message}</AlertTitle>
                 </Alert>
               )}
-              {actionData === "accountExists" && (
-                <Alert status="error" rounded="md">
-                  <AlertIcon />
-                  <AlertTitle>Account already registered.</AlertTitle>
 
-                  <Button
-                    as={Link}
-                    to={"/verify"}
-                    colorScheme="primary"
-                    size="sm"
-                    maxW="125px"
-                  >
-                    Verify Account
-                  </Button>
-                </Alert>
-              )}
-              {actionData === "unknownError" && (
-                <Alert status="error" rounded="md">
-                  <AlertIcon />
-                  <AlertTitle>Unknown error while registering</AlertTitle>
-                </Alert>
+              {actionData?.res?.name === "UsernameExistsException" && (
+                <Button
+                  as={Link}
+                  to={`/verify?emailAddress=${actionData?.res?.formData.emailAddress}`}
+                  colorScheme="primary"
+                >
+                  Verify Account
+                </Button>
               )}
             </VStack>
             <VStack w="100%" spacing={4}>
-              <Checkbox colorScheme="primary" size="md">
-                Agree with Terms & Conditions
-              </Checkbox>
+              <CheckBox
+                type="checkbox"
+                name="agreed"
+                label=" Agree with Terms & Conditions"
+              />
 
               <SubmitButton
                 w="100%"
@@ -317,7 +317,7 @@ export default function Register() {
                 Already have an account?&nbsp;
                 <Text
                   as={Link}
-                  to="/Login"
+                  to="/login"
                   fontSize={{ base: "md", sm: "md" }}
                   fontWeight="bold"
                   _hover={{ textDecoration: "underline" }}

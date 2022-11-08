@@ -5,7 +5,7 @@ import {
   CognitoUserPool,
 } from "amazon-cognito-identity-js";
 
-import { redirect, createCookieSessionStorage } from "@remix-run/node";
+import { redirect, createCookieSessionStorage, json } from "@remix-run/node";
 
 const userPoolId = process.env.COGNITO_USERPOOL_ID;
 const clientId = process.env.COGNITO_CLIENT_ID;
@@ -41,13 +41,19 @@ export async function getSession(request: Request) {
 export async function isAuthenticated(request: Request) {
   const currentSession = await getSession(request);
 
-  console.log(currentSession.data.UserId);
+  return currentSession.has("UserId") ? true : false;
+}
 
-  if (currentSession.data.UserId) {
-    return true;
-  } else {
-    return redirect("/login");
-  }
+export async function protectedRoute(request: Request) {
+  const currentSession = await getSession(request);
+
+  return currentSession.has("UserId") ? true : redirect("/login");
+}
+
+export async function unprotectedRoute(request: Request) {
+  const currentSession = await getSession(request);
+
+  return currentSession.has("UserId") ? redirect("/") : false;
 }
 
 function getCognitoUser(username: string) {
@@ -85,7 +91,12 @@ export async function signUp(username: string, name: string, password: string) {
   });
 }
 
-export async function signIn(request: any, username: string, password: string) {
+export async function signIn(
+  request: any,
+  username: string,
+  password: string,
+  remember: boolean
+) {
   return new Promise(async function (resolve, reject) {
     const authenticationData = {
       Username: username,
@@ -101,15 +112,18 @@ export async function signIn(request: any, username: string, password: string) {
         session.set("UserId", res.idToken);
 
         resolve(
-          redirect("/", {
-            headers: {
-              "Set-Cookie": await sessionStorage.commitSession(session, {
-                maxAge: true
-                  ? 60 * 60 * 24 * 7 // 7 days
-                  : undefined,
-              }),
-            },
-          })
+          json(
+            { status: "Authenticated" },
+            {
+              headers: {
+                "Set-Cookie": await sessionStorage.commitSession(session, {
+                  maxAge: remember
+                    ? 60 * 60 * 24 * 7 // 7 days
+                    : undefined,
+                }),
+              },
+            }
+          )
         );
       },
       onFailure: function (err: any) {
@@ -186,7 +200,7 @@ export async function forgotPassword(
 export async function signOut(request: any) {
   const session = await getSession(request);
 
-  return redirect("/Login", {
+  return redirect("/login", {
     headers: {
       "Set-Cookie": await sessionStorage.destroySession(session),
     },
