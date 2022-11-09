@@ -217,13 +217,6 @@ function SubmitButton(props: any) {
 export default function Login() {
   const actionData = useActionData();
   const loaderData = useLoaderData();
-  console.log(loaderData);
-
-  if (loaderData !== null) {
-    console.log("yes");
-  } else {
-    console.log("no");
-  }
 
   return (
     <Container maxW="7xl" p={{ base: 5, md: 10 }}>
@@ -237,7 +230,7 @@ export default function Login() {
           replace
         >
           <Stack align="center">
-            <Heading fontSize="2xl">Sign in to your account</Heading>
+            <Heading fontSize="2xl">Sign In to your Account</Heading>
           </Stack>
           <VStack
             boxSize={{ base: "xs", sm: "sm", md: "md" }}

@@ -19,4 +19,7 @@ policies
   AmazonSESFullAccess
   AmazonDynamoDBFullAccess
 
-
+@tables
+sessions
+  _idx *String
+  _ttl TTL

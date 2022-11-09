@@ -26,11 +26,7 @@ import Error from "app/components/Error";
 import theme from "app/styles/theme";
 
 import global from "app/styles/global.css";
-import favicon from "public/favicon.ico";
-import LogoPlain from "public/logos/Logo-Plain.svg";
-import LogoSideways from "public/logos/Logo-Sideways.svg";
-
-import * as utils from "app/utils/auth.server";
+import * as auth from "app/utils/auth.server";
 
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
@@ -42,36 +38,15 @@ export const meta: MetaFunction = () => ({
 
 export const links: LinksFunction = () => {
   return [
-    // { rel: "preconnect", href: "https://fonts.googleapis.com" },
-    // { rel: "preconnect", href: "https://fonts.gstatic.com" },
-
-    {
-      rel: "stylesheet",
-      href: "https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&display=swap",
-    },
     {
       rel: "stylesheet",
       href: global,
     },
-    {
-      rel: "preload",
-      href: LogoPlain,
-      as: "image",
-    },
-    {
-      rel: "preload",
-      href: LogoSideways,
-      as: "image",
-    },
-    {
-      rel: "preload",
-      type: "image/png",
-      href: favicon,
-    },
+
     {
       rel: "icon",
       type: "image/png",
-      href: favicon,
+      href: "/_static/favicon.ico",
     },
   ];
 };
@@ -79,6 +54,10 @@ export const links: LinksFunction = () => {
 interface DocumentProps {
   children: React.ReactNode;
 }
+
+export const loader: LoaderFunction = async ({ request }: any) => {
+  return await auth.getSession(request.headers.get("Cookie"));
+};
 
 const Document = withEmotionCache(
   ({ children }: DocumentProps, emotionCache) => {
@@ -97,6 +76,12 @@ const Document = withEmotionCache(
       });
       // reset cache to reapply global styles
       clientStyleData?.reset();
+    }, []);
+
+    const loaderData = useLoaderData();
+
+    useEffect(() => {
+      console.log(loaderData);
     }, []);
 
     return (

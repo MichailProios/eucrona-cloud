@@ -5,7 +5,14 @@ import {
   CognitoUserPool,
 } from "amazon-cognito-identity-js";
 
-import { redirect, createCookieSessionStorage, json } from "@remix-run/node";
+import {
+  createCookie,
+  redirect,
+  createCookieSessionStorage,
+  json,
+} from "@remix-run/node";
+
+import { createArcTableSessionStorage } from "@remix-run/architect";
 
 const userPoolId = process.env.COGNITO_USERPOOL_ID;
 const clientId = process.env.COGNITO_CLIENT_ID;
@@ -22,36 +29,46 @@ const poolData = {
 
 const userPool: CognitoUserPool = new CognitoUserPool(poolData);
 
-const sessionStorage = createCookieSessionStorage({
-  cookie: {
-    name: "EucronaCloud_Session",
-    httpOnly: true,
-    path: "/",
-    sameSite: "lax",
-    secrets: [sessionSecret],
-    secure: process.env.NODE_ENV === "production",
-  },
+// const sessionStorage = createCookieSessionStorage({
+//   cookie: {
+//     name: "EucronaCloud_Session",
+//     httpOnly: true,
+//     path: "/",
+//     sameSite: "lax",
+//     secrets: [sessionSecret],
+//     secure: process.env.NODE_ENV === "production",
+//   },
+// });
+
+const sessionCookie = createCookie("__session", {
+  secrets: [sessionSecret],
+  httpOnly: true,
+  sameSite: true,
+  secure: process.env.NODE_ENV === "production",
 });
 
-export async function getSession(request: Request) {
-  const cookie = request.headers.get("Cookie");
-  return sessionStorage.getSession(cookie);
-}
+export const { getSession, commitSession, destroySession } =
+  createArcTableSessionStorage({
+    table: "sessions",
+    idx: "_idx",
+    ttl: "_ttl",
+    cookie: sessionCookie,
+  });
 
 export async function isAuthenticated(request: Request) {
-  const currentSession = await getSession(request);
+  const currentSession = await getSession(request.headers.get("Cookie"));
 
   return currentSession.has("UserId") ? true : false;
 }
 
 export async function protectedRoute(request: Request) {
-  const currentSession = await getSession(request);
+  const currentSession = await getSession(request.headers.get("Cookie"));
 
-  return currentSession.has("UserId") ? true : redirect("/login");
+  return currentSession.has("UserId") ? currentSession : redirect("/login");
 }
 
 export async function unprotectedRoute(request: Request) {
-  const currentSession = await getSession(request);
+  const currentSession = await getSession(request.headers.get("Cookie"));
 
   return currentSession.has("UserId") ? redirect("/") : false;
 }
@@ -108,15 +125,19 @@ export async function signIn(
 
     currentUser.authenticateUser(authenticationDetails, {
       onSuccess: async function (res: any) {
-        const session = await getSession(request);
+        const session = await getSession(request.headers.get("Cookie"));
         session.set("UserId", res.idToken);
+
+        // const temp = await getSession(request.headers.get("Cookie"));
+
+        // await commitSession(temp);
 
         resolve(
           json(
             { status: "Authenticated" },
             {
               headers: {
-                "Set-Cookie": await sessionStorage.commitSession(session, {
+                "Set-Cookie": await commitSession(session, {
                   maxAge: remember
                     ? 60 * 60 * 24 * 7 // 7 days
                     : undefined,
@@ -198,11 +219,11 @@ export async function forgotPassword(
 }
 
 export async function signOut(request: any) {
-  const session = await getSession(request);
+  const session = await getSession(request.headers.get("Cookie"));
 
   return redirect("/login", {
     headers: {
-      "Set-Cookie": await sessionStorage.destroySession(session),
+      "Set-Cookie": await destroySession(session),
     },
   });
 }
