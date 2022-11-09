@@ -1,7 +1,7 @@
 import React, { useContext, useEffect } from "react";
 import { withEmotionCache } from "@emotion/react";
 import { ChakraProvider } from "@chakra-ui/react";
-import { redirect } from "@remix-run/node";
+import { json, redirect } from "@remix-run/node";
 
 import { useCatch, useLoaderData } from "@remix-run/react";
 
@@ -55,8 +55,23 @@ interface DocumentProps {
   children: React.ReactNode;
 }
 
-export const loader: LoaderFunction = async ({ request }: any) => {
-  return await auth.getSession(request.headers.get("Cookie"));
+export const action = async ({ request }: any) => {
+  try {
+    return await auth.signOut(request);
+  } catch (error) {
+    return "";
+  }
+};
+
+export const loader: LoaderFunction = async ({ request }) => {
+  try {
+    const isAuthRes = await auth.isAuthenticated(request);
+    const userRes = await auth.getSession(request.headers.get("Cookie"));
+
+    return json({ isAuthenticated: isAuthRes, user: userRes });
+  } catch (error) {
+    return "";
+  }
 };
 
 const Document = withEmotionCache(
@@ -76,12 +91,6 @@ const Document = withEmotionCache(
       });
       // reset cache to reapply global styles
       clientStyleData?.reset();
-    }, []);
-
-    const loaderData = useLoaderData();
-
-    useEffect(() => {
-      console.log(loaderData);
     }, []);
 
     return (

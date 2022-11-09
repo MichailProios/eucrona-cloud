@@ -5,12 +5,7 @@ import {
   CognitoUserPool,
 } from "amazon-cognito-identity-js";
 
-import {
-  createCookie,
-  redirect,
-  createCookieSessionStorage,
-  json,
-} from "@remix-run/node";
+import { createCookie, redirect, json } from "@remix-run/node";
 
 import { createArcTableSessionStorage } from "@remix-run/architect";
 
@@ -29,17 +24,6 @@ const poolData = {
 
 const userPool: CognitoUserPool = new CognitoUserPool(poolData);
 
-// const sessionStorage = createCookieSessionStorage({
-//   cookie: {
-//     name: "EucronaCloud_Session",
-//     httpOnly: true,
-//     path: "/",
-//     sameSite: "lax",
-//     secrets: [sessionSecret],
-//     secure: process.env.NODE_ENV === "production",
-//   },
-// });
-
 const sessionCookie = createCookie("__session", {
   secrets: [sessionSecret],
   httpOnly: true,
@@ -57,6 +41,8 @@ export const { getSession, commitSession, destroySession } =
 
 export async function isAuthenticated(request: Request) {
   const currentSession = await getSession(request.headers.get("Cookie"));
+
+  console.log(currentSession.has("UserId"));
 
   return currentSession.has("UserId") ? true : false;
 }
@@ -127,10 +113,6 @@ export async function signIn(
       onSuccess: async function (res: any) {
         const session = await getSession(request.headers.get("Cookie"));
         session.set("UserId", res.idToken);
-
-        // const temp = await getSession(request.headers.get("Cookie"));
-
-        // await commitSession(temp);
 
         resolve(
           json(

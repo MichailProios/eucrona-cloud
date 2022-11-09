@@ -11,6 +11,7 @@ import {
   Center,
   Skeleton,
   Spinner,
+  Progress,
 } from "@chakra-ui/react";
 
 import { animateScroll as scroll } from "react-scroll";
@@ -18,6 +19,7 @@ import { animateScroll as scroll } from "react-scroll";
 import ExecutionEnvironment from "exenv";
 
 import Navbar from "app/components/Navbar";
+import Dashboard from "~/components/Dashboard";
 import Footer from "app/components/Footer";
 
 import { FaGithub, FaLinkedin } from "react-icons/fa";
@@ -25,6 +27,9 @@ import { FaGithub, FaLinkedin } from "react-icons/fa";
 import { useWindowDimensions } from "app/utils/hooks";
 import { useScrollButtonVisibility } from "app/utils/hooks";
 import { ChevronUpIcon } from "@chakra-ui/icons";
+import { useLoaderData, useTransition } from "@remix-run/react";
+import * as auth from "app/utils/auth.server";
+import { LoaderFunction } from "@remix-run/node";
 
 interface LayoutProps {
   children: ReactNode;
@@ -52,6 +57,14 @@ const eucronaAccounts = [
   },
 ];
 
+// export const loader: LoaderFunction = async ({ request }: any) => {
+//   try {
+//     return await auth.isAuthenticated(request);
+//   } catch (error) {
+//     return "";
+//   }
+// };
+
 export default function Layout({ children }: LayoutProps) {
   const [flag, setFlag] = useState(false);
   const { height } = useWindowDimensions();
@@ -74,6 +87,9 @@ export default function Layout({ children }: LayoutProps) {
     }
   };
 
+  const { isAuthenticated } = useLoaderData();
+  const transition = useTransition();
+
   return (
     <Box
       display={"flex"}
@@ -82,10 +98,47 @@ export default function Layout({ children }: LayoutProps) {
       flexDirection={"column"}
       justifyContent="flex-start"
     >
-      <Navbar
-        navigationLinks={navigationLinks}
-        eucronaAccounts={eucronaAccounts}
-      />
+      {!isAuthenticated && (
+        <>
+          <Navbar
+            navigationLinks={navigationLinks}
+            eucronaAccounts={eucronaAccounts}
+          />
+          <Progress
+            isIndeterminate
+            display={transition.state !== "idle" ? "flex" : "none"}
+            size="xs"
+            position="fixed"
+            top={"64px"}
+            zIndex={800}
+            width={"100%"}
+            backgroundColor="transparent"
+            colorScheme={"primary"}
+          />
+          <Box>{children}</Box>
+        </>
+      )}
+
+      {isAuthenticated && (
+        <>
+          {/* <Navbar
+            navigationLinks={navigationLinks}
+            eucronaAccounts={eucronaAccounts}
+          />
+          <Progress */}
+          {/* isIndeterminate
+            display={transition.state !== "idle" ? "flex" : "none"}
+            size="xs"
+            position="fixed"
+            top={"64px"}
+            zIndex={800}
+            width={"100%"}
+            backgroundColor="transparent"
+            colorScheme={"primary"}
+          /> */}
+          <Dashboard>{children}</Dashboard>
+        </>
+      )}
 
       <Box display={{ base: "none", md: "flex" }}>
         <Fade in={showButton} unmountOnExit style={{ zIndex: 1000 }}>
@@ -108,13 +161,8 @@ export default function Layout({ children }: LayoutProps) {
         </Fade>
       </Box>
 
-      <Box>{children}</Box>
       {/* <Box marginTop={"auto"}>
-        <Divider />
-        <Footer
-          navigationLinks={navigationLinks}
-          eucronaAccounts={eucronaAccounts}
-        />
+        <Footer />
       </Box> */}
     </Box>
   );
