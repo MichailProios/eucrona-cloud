@@ -151,21 +151,20 @@ export default function VerifyIdentify() {
 
   return (
     <SlideFade in={true} reverse delay={0.1}>
-      <Container maxW="7xl" p={{ base: 5, md: 10 }}>
-        <Center>
-          <Stack
-            spacing={4}
-            as={ValidatedForm}
-            validator={validator}
-            method="post"
-            id="verifyIdentifyForm"
-            replace
-          >
+      <Container maxW="7xl" p={{ base: 1, md: 10 }}>
+        <Center
+          as={ValidatedForm}
+          validator={validator}
+          method="post"
+          id="verifyIdentifyForm"
+          replace
+        >
+          <Stack spacing={4}>
             <Stack align="center">
               <Heading fontSize="2xl">Verify Account</Heading>
             </Stack>
             <VStack
-              boxSize={{ base: "xs", sm: "sm", md: "md" }}
+              boxSize={{ base: "auto", xs: "xs", sm: "sm", md: "md" }}
               h="max-content !important"
               bg={useColorModeValue("white", "gray.700")}
               rounded="xl"

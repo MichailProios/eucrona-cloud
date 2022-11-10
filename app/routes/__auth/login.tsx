@@ -221,21 +221,20 @@ export default function Login() {
 
   return (
     <SlideFade in={true} reverse delay={0.1}>
-      <Container maxW="7xl" p={{ base: 5, md: 10 }}>
-        <Center>
-          <Stack
-            spacing={4}
-            as={ValidatedForm}
-            validator={validator}
-            method="post"
-            id="loginForm"
-            replace
-          >
+      <Container maxW="7xl" p={{ base: 1, md: 10 }}>
+        <Center
+          as={ValidatedForm}
+          validator={validator}
+          method="post"
+          id="loginForm"
+          replace
+        >
+          <Stack spacing={4}>
             <Stack align="center">
               <Heading fontSize="2xl">Sign In to your Account</Heading>
             </Stack>
             <VStack
-              boxSize={{ base: "xs", sm: "sm", md: "md" }}
+              boxSize={{ base: "auto", xs: "xs", sm: "sm", md: "md" }}
               h="max-content !important"
               bg={useColorModeValue("white", "gray.700")}
               rounded="xl"
@@ -258,12 +257,14 @@ export default function Login() {
                   placeholder="Enter your password"
                   rounded="md"
                 />
+
                 {actionData?.res && (
                   <Alert status="error" rounded="md">
                     <AlertIcon />
                     <AlertTitle>{actionData?.res?.message}</AlertTitle>
                   </Alert>
                 )}
+
                 {loaderData !== null && (
                   <Alert status="success" rounded="md">
                     <AlertIcon />
@@ -276,9 +277,6 @@ export default function Login() {
               </VStack>
               <VStack w="100%" spacing={4}>
                 <Stack direction="row" justify="space-between" w="100%">
-                  {/* <Checkbox colorScheme="primary" size="md">
-                  Remember me
-                </Checkbox> */}
                   <CheckBox
                     type="checkbox"
                     name="remember"
@@ -288,7 +286,6 @@ export default function Login() {
                     as={Link}
                     to="/forgot"
                     fontSize={{ base: "md", sm: "md" }}
-                    // fontWeight="bold"
                     _hover={{ textDecoration: "underline" }}
                   >
                     Forgot Password?

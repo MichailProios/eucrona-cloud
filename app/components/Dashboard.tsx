@@ -37,20 +37,21 @@ import {
   Stack,
   useBoolean,
   SlideFade,
+  Center,
 } from "@chakra-ui/react";
 
 import { Form, NavLink, useLoaderData, useTransition } from "@remix-run/react";
 
-import {
-  FiHome,
-  FiTrendingUp,
-  FiCompass,
-  FiStar,
-  FiSettings,
-  FiMenu,
-  FiBell,
-  FiChevronDown,
-} from "react-icons/fi";
+// import {
+//   FiHome,
+//   FiTrendingUp,
+//   FiCompass,
+//   FiStar,
+//   FiSettings,
+//   FiMenu,
+//   FiBell,
+//   FiChevronDown,
+// } from "react-icons/fi";
 
 import {
   HamburgerIcon,
@@ -328,20 +329,22 @@ function Header({
             </SlideFade>
           </HStack>
 
-          <HStack spacing={4}>
-            <IconButton
-              variant={"ghost"}
-              aria-label="Color Scheme"
-              onClick={() => {
-                toggleColorMode();
-              }}
-            >
-              {colorMode === "light" ? <MoonIcon /> : <SunIcon />}
-            </IconButton>
+          <HStack spacing={{ base: 0, sm: 4 }}>
+            <HStack spacing={{ base: 0, sm: "2px" }}>
+              <IconButton
+                variant={"ghost"}
+                aria-label="Color Scheme"
+                onClick={() => {
+                  toggleColorMode();
+                }}
+              >
+                {colorMode === "light" ? <MoonIcon /> : <SunIcon />}
+              </IconButton>
 
-            <IconButton variant={"ghost"} aria-label="Notifications">
-              <BellIcon fontSize={"xl"} />
-            </IconButton>
+              <IconButton variant={"ghost"} aria-label="Notifications">
+                <BellIcon fontSize={"xl"} />
+              </IconButton>
+            </HStack>
             <UserMenu />
           </HStack>
         </Flex>
@@ -354,41 +357,85 @@ function UserMenu() {
   const { user } = useLoaderData();
 
   return (
-    <Flex alignItems={"center"}>
-      <Menu>
-        <MenuButton
-          h={12}
-          as={Button}
-          variant="ghost"
-          p={2}
-          rightIcon={<ChevronDownIcon />}
-          transition="all 0.3s"
-        >
-          <HStack>
-            <Avatar size={"sm"} />
-            <VStack
-              display={{ base: "none", md: "flex" }}
-              alignItems="flex-start"
-              spacing="1px"
-              ml="2"
-            >
-              <Text fontSize="sm">{user.data.UserId.payload.name}</Text>
-              <Text fontSize="xs" color="gray.600">
-                Basic User
-              </Text>
-            </VStack>
-          </HStack>
-        </MenuButton>
-        <MenuList bg={useColorModeValue("gray.50", "gray.900")} boxShadow="md">
-          <MenuItem>Profile</MenuItem>
-          <MenuItem>Settings</MenuItem>
-          <MenuDivider />
-          <Form method="post" replace>
-            <MenuItem type="submit">Sign out</MenuItem>
-          </Form>
-        </MenuList>
-      </Menu>
-    </Flex>
+    <>
+      <Flex alignItems={"center"} display={{ base: "none", sm: "flex" }}>
+        <Menu>
+          <MenuButton
+            h={12}
+            as={Button}
+            variant="ghost"
+            p={2}
+            rightIcon={<ChevronDownIcon />}
+            transition="all 0.3s"
+          >
+            <HStack>
+              <Avatar size={"sm"} />
+              <VStack
+                display={{ base: "none", md: "flex" }}
+                alignItems="flex-start"
+                spacing="1px"
+                ml="2"
+              >
+                <Text fontSize="sm">{user.data.UserId.payload.name}</Text>
+                <Text fontSize="xs" color="gray.600">
+                  Basic User
+                </Text>
+              </VStack>
+            </HStack>
+          </MenuButton>
+
+          <MenuList
+            bg={useColorModeValue("gray.50", "gray.900")}
+            boxShadow="md"
+          >
+            <MenuItem>Profile</MenuItem>
+            <MenuItem>Settings</MenuItem>
+            <MenuDivider />
+            <Form method="post" replace>
+              <MenuItem type="submit">Sign out</MenuItem>
+            </Form>
+          </MenuList>
+        </Menu>
+      </Flex>
+      <Flex alignItems={"center"} display={{ base: "flex", sm: "none" }}>
+        <Menu>
+          <MenuButton
+            h={12}
+            as={Button}
+            variant="ghost"
+            p={2}
+            transition="all 0.3s"
+          >
+            <HStack>
+              <Avatar size={"sm"} />
+              <VStack
+                display={{ base: "none", md: "flex" }}
+                alignItems="flex-start"
+                spacing="1px"
+                ml="2"
+              >
+                <Text fontSize="sm">{user.data.UserId.payload.name}</Text>
+                <Text fontSize="xs" color="gray.600">
+                  Basic User
+                </Text>
+              </VStack>
+            </HStack>
+          </MenuButton>
+
+          <MenuList
+            bg={useColorModeValue("gray.50", "gray.900")}
+            boxShadow="md"
+          >
+            <MenuItem>Profile</MenuItem>
+            <MenuItem>Settings</MenuItem>
+            <MenuDivider />
+            <Form method="post" replace>
+              <MenuItem type="submit">Sign out</MenuItem>
+            </Form>
+          </MenuList>
+        </Menu>
+      </Flex>
+    </>
   );
 }
 
@@ -405,6 +452,8 @@ function SidebarDrawer({
   onClose,
   btnRef,
 }: SidebarDrawerProps) {
+  const { colorMode, toggleColorMode } = useColorMode();
+
   return (
     <Drawer
       isOpen={isOpen}

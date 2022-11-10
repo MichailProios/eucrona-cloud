@@ -87,7 +87,7 @@ export default function Layout({ children }: LayoutProps) {
     }
   };
 
-  const { isAuthenticated } = useLoaderData();
+  const loaderData = useLoaderData();
   const transition = useTransition();
 
   return (
@@ -98,7 +98,16 @@ export default function Layout({ children }: LayoutProps) {
       flexDirection={"column"}
       justifyContent="flex-start"
     >
-      {!isAuthenticated && (
+      {loaderData?.isAuthenticated ? (
+        <>
+          <Dashboard>
+            {children}
+            <Box marginTop={"auto"}>
+              <Footer />
+            </Box>
+          </Dashboard>
+        </>
+      ) : (
         <>
           <Navbar
             navigationLinks={navigationLinks}
@@ -119,17 +128,6 @@ export default function Layout({ children }: LayoutProps) {
           <Box marginTop={"auto"}>
             <Footer />
           </Box>
-        </>
-      )}
-
-      {isAuthenticated && (
-        <>
-          <Dashboard>
-            {children}
-            <Box marginTop={"auto"}>
-              <Footer />
-            </Box>
-          </Dashboard>
         </>
       )}
 

@@ -15,12 +15,21 @@ const colors = {
   },
 };
 
+const breakpoints = {
+  xs: "20em",
+  sm: "30em",
+  md: "48em",
+  lg: "62em",
+  xl: "80em",
+  "2xl": "96em",
+};
+
 const config = {
   initialColorMode: "light",
 };
 
 const components = {};
 
-const theme = extendTheme({ config, colors, components });
+const theme = extendTheme({ config, colors, components, breakpoints });
 
 export default theme;

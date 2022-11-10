@@ -10,12 +10,6 @@ import {
   useColorModeValue,
   VStack,
   Center,
-  InputGroup,
-  InputRightElement,
-  Checkbox,
-  FormErrorMessage,
-  Textarea,
-  Divider,
   Text,
   Alert,
   AlertIcon,
@@ -23,28 +17,13 @@ import {
   PinInput,
   PinInputField,
   HStack,
-  Flex,
-  useDisclosure,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
   Spinner,
-  IconButton,
   SlideFade,
 } from "@chakra-ui/react";
 
-import { LoaderFunction, redirect } from "@remix-run/node";
-import {
-  ValidatedForm,
-  validationError,
-  useIsSubmitting,
-  useField,
-} from "remix-validated-form";
-import { withZod } from "@remix-validated-form/with-zod";
-import { z } from "zod";
+import { redirect } from "@remix-run/node";
+
+import type { LoaderFunction } from "@remix-run/node";
 
 import * as auth from "app/utils/auth.server";
 import {
@@ -148,14 +127,14 @@ export default function Verify() {
 
   return (
     <SlideFade in={true} reverse delay={0.1}>
-      <Container maxW="7xl" p={{ base: 5, md: 10 }}>
+      <Container maxW="7xl" p={{ base: 1, md: 10 }}>
         <Center>
           <Stack spacing={4}>
             <Stack align="center">
               <Heading fontSize="2xl">Verify Account</Heading>
             </Stack>
             <VStack
-              boxSize={{ base: "xs", sm: "sm", md: "md" }}
+              boxSize={{ base: "auto", xs: "xs", sm: "sm", md: "md" }}
               h="max-content !important"
               bg={useColorModeValue("white", "gray.700")}
               rounded="xl"
@@ -172,10 +151,11 @@ export default function Verify() {
                     justifyContent="center"
                     as={Form}
                     method="post"
+                    spacing={{ base: 1, sm: 2 }}
                   >
                     <PinInput
                       otp
-                      size="lg"
+                      size={{ base: "sm", xs: "md", sm: "lg" }}
                       autoFocus
                       onComplete={(value) => {
                         handleVerify(value);
@@ -233,90 +213,7 @@ export default function Verify() {
             </VStack>
           </Stack>
         </Center>
-        {/* <EmailModal /> */}
       </Container>
     </SlideFade>
   );
 }
-
-// function EmailModal() {
-//   const { isOpen, onOpen, onClose } = useDisclosure();
-//   const submit = useSubmit();
-//   const emailAddress = useLoaderData();
-
-//   const [email, setEmail] = useState("");
-//   const [validationError, setValidationError] = useState(false);
-//   const [validationMessage, setValidationMessage] = useState(null);
-
-//   function handleEmail(value: string) {
-//     try {
-//       setEmail(value);
-//       emailValidator.parse(value);
-//     } catch (error: any) {
-//       setValidationError(true);
-//       setValidationMessage(error.message);
-//       console.log(validationMessage);
-//     }
-//   }
-
-//   useEffect(() => {
-//     if (!emailAddress) {
-//       onOpen();
-//     } else {
-//       onClose();
-//     }
-//   }, [emailAddress, onOpen, onClose]);
-
-//   const isSubmitting: any = useTransition().submission;
-
-//   return (
-//     <Modal
-//       isOpen={isOpen}
-//       onClose={onClose}
-//       autoFocus
-//       closeOnEsc={false}
-//       closeOnOverlayClick={false}
-//     >
-//       <ModalOverlay />
-//       <ModalContent>
-//         <ModalHeader>Verify Account</ModalHeader>
-//         <Form method="post" replace>
-//           <ModalBody pb={6}>
-//             <Text>
-//               In order to further verify your account, please enter your email
-//               address.
-//             </Text>
-//             <br />
-//             <FormControl>
-//               <FormLabel>Email</FormLabel>
-//               <Input
-//                 placeholder="Email Address"
-//                 type="email"
-//                 name="emailAddress"
-//                 readOnly={isSubmitting}
-//                 value={email}
-//                 onChange={(e) => {
-//                   handleEmail(e.target.value);
-//                 }}
-//                 // onSubmit={handleSet}
-//               />
-//               <input type="hidden" name="type" value="set" />
-//             </FormControl>
-//           </ModalBody>
-//         </Form>
-
-//         <ModalFooter>
-//           <Button
-//             colorScheme="primary"
-//             mr={3}
-//             type="submit"
-//             w={"100%"}
-//             isLoading={isSubmitting}
-//           >
-//             Set Email
-//           </Button>
-//         </ModalFooter>
-//       </ModalContent>
-//     </Modal>
-//   );
-// }
