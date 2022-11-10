@@ -116,27 +116,20 @@ export default function Layout({ children }: LayoutProps) {
             colorScheme={"primary"}
           />
           <Box>{children}</Box>
+          <Box marginTop={"auto"}>
+            <Footer />
+          </Box>
         </>
       )}
 
       {isAuthenticated && (
         <>
-          {/* <Navbar
-            navigationLinks={navigationLinks}
-            eucronaAccounts={eucronaAccounts}
-          />
-          <Progress */}
-          {/* isIndeterminate
-            display={transition.state !== "idle" ? "flex" : "none"}
-            size="xs"
-            position="fixed"
-            top={"64px"}
-            zIndex={800}
-            width={"100%"}
-            backgroundColor="transparent"
-            colorScheme={"primary"}
-          /> */}
-          <Dashboard>{children}</Dashboard>
+          <Dashboard>
+            {children}
+            <Box marginTop={"auto"}>
+              <Footer />
+            </Box>
+          </Dashboard>
         </>
       )}
 
@@ -160,10 +153,6 @@ export default function Layout({ children }: LayoutProps) {
           </Tooltip>
         </Fade>
       </Box>
-
-      {/* <Box marginTop={"auto"}>
-        <Footer />
-      </Box> */}
     </Box>
   );
 }

@@ -42,8 +42,6 @@ export const { getSession, commitSession, destroySession } =
 export async function isAuthenticated(request: Request) {
   const currentSession = await getSession(request.headers.get("Cookie"));
 
-  console.log(currentSession.has("UserId"));
-
   return currentSession.has("UserId") ? true : false;
 }
 

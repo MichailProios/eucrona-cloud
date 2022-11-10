@@ -34,6 +34,11 @@ import {
   MenuItem,
   MenuList,
   Progress,
+  Stack,
+  useBoolean,
+  SlideFade,
+  Slide,
+  ScaleFade,
 } from "@chakra-ui/react";
 
 import { Form, NavLink, useLoaderData, useTransition } from "@remix-run/react";
@@ -55,10 +60,13 @@ import {
   SunIcon,
   BellIcon,
   ChevronDownIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
 } from "@chakra-ui/icons";
 
 import LogoSideways from "public/logos/Logo-Sideways.svg";
 import LogoPlain from "public/logos/Logo-Plain.svg";
+import { useWindowDimensions } from "~/utils/hooks";
 
 interface NavbarProps {
   children: any;
@@ -79,20 +87,7 @@ export default function Dashboard({ children }: NavbarProps) {
 
   return (
     <>
-      {/* <Header colorMode={colorMode} toggleColorMode={toggleColorMode} /> */}
-
       <Sidebar>{children}</Sidebar>
-
-      {/* <NavbarDrawer
-        isOpen={isOpen}
-        onOpen={onOpen}
-        onClose={onClose}
-        btnRef={btnRef}
-        colorMode={colorMode}
-        toggleColorMode={toggleColorMode}
-        navigationLinks={navigationLinks}
-        eucronaAccounts={eucronaAccounts}
-      /> */}
     </>
   );
 }
@@ -104,67 +99,130 @@ interface SidebarProps extends BoxProps {
 
 const Sidebar = ({ children, ...rest }: SidebarProps) => {
   const { colorMode, toggleColorMode } = useColorMode();
+  const [sidebar, setSidebar] = useBoolean();
+  const transition = useTransition();
+  const { height } = useWindowDimensions();
+  const breakpoint = useBreakpoint({ ssr: true });
+
+  useEffect(() => {
+    if (breakpoint === "lg" || breakpoint === "md") {
+      setSidebar.on();
+    } else {
+      setSidebar.off();
+    }
+  }, [breakpoint, setSidebar]);
 
   return (
-    <Flex flexDirection="row">
+    <Flex
+      flexDirection="row"
+      justifyContent="flex-start"
+      display={{ sm: "none", md: "flex" }}
+    >
       <Box
-        // transition="1s ease"
+        transition="0.3s ease"
         zIndex={850}
         bg={useColorModeValue("gray.50", "gray.900")}
         borderRight="1px"
         borderRightColor={useColorModeValue("gray.200", "gray.800")}
         boxShadow={"md"}
-        w={{ base: "full", md: 60 }}
+        w={sidebar ? "60px" : "240px"}
         position="fixed"
         h="full"
+        display="flex"
+        flexDirection={"column"}
+        justifyContent="center"
         {...rest}
       >
         <Flex h={16} alignItems="center" justifyContent="center">
-          <NavLink to={"/"} prefetch="render" draggable={false}>
-            <Box
-              sx={{
-                display: "flex",
-                "@media screen and (max-width: 370px)": {
-                  display: "none",
-                },
-              }}
-            >
-              <Image
-                objectFit="contain"
-                h={50}
-                w={"auto"}
-                minWidth="156px"
-                src={LogoSideways}
-                alt="Eucrona-Logo"
-                draggable="false"
-                loading="eager"
-              />
-            </Box>
-            <Box
-              sx={{
-                display: "none",
-                "@media screen and (max-width: 370px)": {
-                  display: "flex",
-                },
-              }}
-            >
-              <Image
-                objectFit="contain"
-                h={50}
-                w={"auto"}
-                src={LogoPlain}
-                alt="Eucrona-Logo"
-                draggable="false"
-                loading="eager"
-              />
-            </Box>
-          </NavLink>
+          <HStack direction={"row"} align="center" spacing={sidebar ? 0 : 4}>
+            <SlideFade in={!sidebar} reverse>
+              <NavLink
+                to={"/"}
+                draggable={false}
+                style={{ display: sidebar ? "none" : "flex" }}
+              >
+                <Box>
+                  <Image
+                    objectFit="contain"
+                    h={50}
+                    w={"auto"}
+                    minWidth="156px"
+                    src={LogoSideways}
+                    alt="Eucrona-Logo"
+                    draggable="false"
+                    loading="eager"
+                  />
+                </Box>
+              </NavLink>
+            </SlideFade>
+            <SlideFade in={sidebar} reverse>
+              <NavLink
+                to={"/"}
+                draggable={false}
+                style={{ display: sidebar ? "flex" : "none" }}
+              >
+                <Box>
+                  <Image
+                    objectFit="contain"
+                    h={"35px"}
+                    w={"auto"}
+                    src={LogoPlain}
+                    alt="Eucrona-Logo"
+                    draggable="false"
+                    loading="eager"
+                  />
+                </Box>
+              </NavLink>
+            </SlideFade>
+          </HStack>
         </Flex>
+
+        <Box
+          display="flex"
+          w="100%"
+          justifyContent="flex-end"
+          alignItems="flex-end"
+          marginTop="auto"
+        >
+          <IconButton
+            variant={"ghost"}
+            aria-label="Sidebar Toggle"
+            onClick={setSidebar.toggle}
+            m={"10px"}
+          >
+            {sidebar ? (
+              <ChevronRightIcon fontSize={"xl"} />
+            ) : (
+              <ChevronLeftIcon fontSize={"xl"} />
+            )}
+          </IconButton>
+        </Box>
       </Box>
 
       <Box w={"100%"}>
         <Header colorMode={colorMode} toggleColorMode={toggleColorMode} />
-        <Box ml={60}>{children}</Box>
+        <Progress
+          isIndeterminate
+          width={"100%"}
+          display={transition.state !== "idle" ? "flex" : "none"}
+          ml={sidebar ? "60px" : "240px"}
+          size="xs"
+          position="fixed"
+          top={"64px"}
+          zIndex={800}
+          backgroundColor="transparent"
+          colorScheme={"primary"}
+        />
+        <Box
+          transition="0.3s ease"
+          ml={sidebar ? "60px" : "240px"}
+          display={"flex"}
+          flexDirection={"column"}
+          justifyContent="flex-start"
+          minHeight={height ? `calc(${height}px - 64px)` : `calc(100vh - 64px)`}
+        >
+          {children}
+        </Box>
       </Box>
     </Flex>
   );
@@ -176,8 +234,6 @@ interface HeaderProps {
 }
 
 function Header({ colorMode, toggleColorMode }: HeaderProps) {
-  const transition = useTransition();
-
   return (
     <>
       <Flex
@@ -217,18 +273,6 @@ function Header({ colorMode, toggleColorMode }: HeaderProps) {
           </HStack>
         </Flex>
       </Flex>
-      <Progress
-        isIndeterminate
-        width={"100%"}
-        display={transition.state !== "idle" ? "flex" : "none"}
-        ml={60}
-        size="xs"
-        position="fixed"
-        top={"64px"}
-        zIndex={800}
-        backgroundColor="transparent"
-        colorScheme={"primary"}
-      />
     </>
   );
 }
@@ -240,9 +284,10 @@ function UserMenu() {
     <Flex alignItems={"center"}>
       <Menu>
         <MenuButton
+          h={12}
           as={Button}
           variant="ghost"
-          p={1}
+          p={2}
           rightIcon={<ChevronDownIcon />}
           transition="all 0.3s"
         >
@@ -261,14 +306,9 @@ function UserMenu() {
             </VStack>
           </HStack>
         </MenuButton>
-        <MenuList
-          bg={useColorModeValue("white", "gray.900")}
-          borderColor={useColorModeValue("gray.200", "gray.700")}
-          boxShadow="md"
-        >
+        <MenuList bg={useColorModeValue("gray.50", "gray.900")} boxShadow="md">
           <MenuItem>Profile</MenuItem>
           <MenuItem>Settings</MenuItem>
-          {/* <MenuItem>Billing</MenuItem> */}
           <MenuDivider />
           <Form method="post" replace>
             <MenuItem type="submit">Sign out</MenuItem>
