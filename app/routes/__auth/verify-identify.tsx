@@ -33,6 +33,7 @@ import {
   ModalBody,
   Spinner,
   IconButton,
+  SlideFade,
 } from "@chakra-ui/react";
 
 import { LoaderFunction, redirect } from "@remix-run/node";
@@ -145,72 +146,74 @@ function SubmitButton(props: any) {
   );
 }
 
-export default function Verify() {
+export default function VerifyIdentify() {
   const actionData = useActionData();
 
   return (
-    <Container maxW="7xl" p={{ base: 5, md: 10 }}>
-      <Center>
-        <Stack
-          spacing={4}
-          as={ValidatedForm}
-          validator={validator}
-          method="post"
-          id="verifyIdentifyForm"
-          replace
-        >
-          <Stack align="center">
-            <Heading fontSize="2xl">Verify Account</Heading>
-          </Stack>
-          <VStack
-            boxSize={{ base: "xs", sm: "sm", md: "md" }}
-            h="max-content !important"
-            bg={useColorModeValue("white", "gray.700")}
-            rounded="xl"
-            boxShadow={"2xl"}
-            p={{ base: 5, sm: 10 }}
-            spacing={8}
+    <SlideFade in={true} reverse delay={0.1}>
+      <Container maxW="7xl" p={{ base: 5, md: 10 }}>
+        <Center>
+          <Stack
+            spacing={4}
+            as={ValidatedForm}
+            validator={validator}
+            method="post"
+            id="verifyIdentifyForm"
+            replace
           >
-            <VStack spacing={4} w="100%">
-              <TextField
-                label="Email Address"
-                name="emailAddress"
-                placeholder="Enter your email"
-                rounded="md"
-                type="email"
-              />
-              {actionData?.res && (
-                <Alert status="error" rounded="md">
-                  <AlertIcon />
-                  <AlertTitle>{actionData?.res?.message}</AlertTitle>
-                </Alert>
-              )}
-            </VStack>
+            <Stack align="center">
+              <Heading fontSize="2xl">Verify Account</Heading>
+            </Stack>
+            <VStack
+              boxSize={{ base: "xs", sm: "sm", md: "md" }}
+              h="max-content !important"
+              bg={useColorModeValue("white", "gray.700")}
+              rounded="xl"
+              boxShadow={"2xl"}
+              p={{ base: 5, sm: 10 }}
+              spacing={8}
+            >
+              <VStack spacing={4} w="100%">
+                <TextField
+                  label="Email Address"
+                  name="emailAddress"
+                  placeholder="Enter your email"
+                  rounded="md"
+                  type="email"
+                />
+                {actionData?.res && (
+                  <Alert status="error" rounded="md">
+                    <AlertIcon />
+                    <AlertTitle>{actionData?.res?.message}</AlertTitle>
+                  </Alert>
+                )}
+              </VStack>
 
-            <VStack spacing={4} w="100%">
-              <SubmitButton
-                w="100%"
-                colorScheme="primary"
-                label="Verify Account"
-                type="submit"
-              />
+              <VStack spacing={4} w="100%">
+                <SubmitButton
+                  w="100%"
+                  colorScheme="primary"
+                  label="Verify Account"
+                  type="submit"
+                />
 
-              <Text>
-                Already verified?&nbsp;
-                <Text
-                  as={Link}
-                  to="/login"
-                  fontSize={{ base: "md", sm: "md" }}
-                  fontWeight="bold"
-                  _hover={{ textDecoration: "underline" }}
-                >
-                  Sign In
+                <Text>
+                  Already verified?&nbsp;
+                  <Text
+                    as={Link}
+                    to="/login"
+                    fontSize={{ base: "md", sm: "md" }}
+                    fontWeight="bold"
+                    _hover={{ textDecoration: "underline" }}
+                  >
+                    Sign In
+                  </Text>
                 </Text>
-              </Text>
+              </VStack>
             </VStack>
-          </VStack>
-        </Stack>
-      </Center>
-    </Container>
+          </Stack>
+        </Center>
+      </Container>
+    </SlideFade>
   );
 }

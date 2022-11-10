@@ -21,6 +21,7 @@ import {
   Avatar,
   Center,
   Image,
+  VStack,
 } from "@chakra-ui/react";
 
 import type { LoaderFunction } from "@remix-run/node";
@@ -39,9 +40,20 @@ export const loader: LoaderFunction = async ({ request }: any) => {
 export default function Index() {
   return (
     <Fragment>
-      <Link to={"/whoami"} draggable="false" prefetch="render">
-        User Info
-      </Link>
+      <Center display={"flex"} flexDirection="column">
+        <VStack>
+          <Text fontSize="xl"> Welcome to the Eucrona Cloud Dashboard </Text>
+          <Button
+            as={Link}
+            to={"/whoami"}
+            draggable="false"
+            prefetch="render"
+            colorScheme={"primary"}
+          >
+            Show Signed User Information
+          </Button>
+        </VStack>
+      </Center>
     </Fragment>
   );
 }

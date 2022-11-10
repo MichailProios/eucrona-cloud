@@ -33,6 +33,7 @@ import {
   ModalBody,
   Spinner,
   IconButton,
+  SlideFade,
 } from "@chakra-ui/react";
 
 import { LoaderFunction, redirect } from "@remix-run/node";
@@ -146,93 +147,95 @@ export default function Verify() {
   }
 
   return (
-    <Container maxW="7xl" p={{ base: 5, md: 10 }}>
-      <Center>
-        <Stack spacing={4}>
-          <Stack align="center">
-            <Heading fontSize="2xl">Verify Account</Heading>
-          </Stack>
-          <VStack
-            boxSize={{ base: "xs", sm: "sm", md: "md" }}
-            h="max-content !important"
-            bg={useColorModeValue("white", "gray.700")}
-            rounded="xl"
-            boxShadow={"2xl"}
-            p={{ base: 5, sm: 10 }}
-            spacing={8}
-          >
-            <VStack spacing={4} w="100%">
-              <FormControl id={"otp"}>
-                <FormLabel textAlign={"center"}>One Time Pin</FormLabel>
-                <HStack
-                  w="100%"
-                  display="flex"
-                  justifyContent="center"
-                  as={Form}
-                  method="post"
-                >
-                  <PinInput
-                    otp
-                    size="lg"
-                    autoFocus
-                    onComplete={(value) => {
-                      handleVerify(value);
-                    }}
+    <SlideFade in={true} reverse delay={0.1}>
+      <Container maxW="7xl" p={{ base: 5, md: 10 }}>
+        <Center>
+          <Stack spacing={4}>
+            <Stack align="center">
+              <Heading fontSize="2xl">Verify Account</Heading>
+            </Stack>
+            <VStack
+              boxSize={{ base: "xs", sm: "sm", md: "md" }}
+              h="max-content !important"
+              bg={useColorModeValue("white", "gray.700")}
+              rounded="xl"
+              boxShadow={"2xl"}
+              p={{ base: 5, sm: 10 }}
+              spacing={8}
+            >
+              <VStack spacing={4} w="100%">
+                <FormControl id={"otp"}>
+                  <FormLabel textAlign={"center"}>One Time Pin</FormLabel>
+                  <HStack
+                    w="100%"
+                    display="flex"
+                    justifyContent="center"
+                    as={Form}
+                    method="post"
                   >
-                    <PinInputField readOnly={isSubmitting} />
-                    <PinInputField readOnly={isSubmitting} />
-                    <PinInputField readOnly={isSubmitting} />
-                    <PinInputField readOnly={isSubmitting} />
-                    <PinInputField readOnly={isSubmitting} />
-                    <PinInputField readOnly={isSubmitting} />
-                  </PinInput>
-                </HStack>
-              </FormControl>
+                    <PinInput
+                      otp
+                      size="lg"
+                      autoFocus
+                      onComplete={(value) => {
+                        handleVerify(value);
+                      }}
+                    >
+                      <PinInputField readOnly={isSubmitting} />
+                      <PinInputField readOnly={isSubmitting} />
+                      <PinInputField readOnly={isSubmitting} />
+                      <PinInputField readOnly={isSubmitting} />
+                      <PinInputField readOnly={isSubmitting} />
+                      <PinInputField readOnly={isSubmitting} />
+                    </PinInput>
+                  </HStack>
+                </FormControl>
 
-              {actionData?.res && !isSubmitting ? (
-                <Alert status="error" rounded="md">
-                  <AlertIcon />
-                  <AlertTitle>{actionData?.res.message} </AlertTitle>
-                </Alert>
-              ) : isSubmitting ? (
-                <Spinner size="xl" />
-              ) : (
-                <Alert status="info" rounded="md">
-                  <AlertIcon />
-                  <AlertTitle>
-                    A one time pin was sent to your email. Please enter the
-                    code.
-                  </AlertTitle>
-                </Alert>
-              )}
-            </VStack>
-
-            <VStack spacing={4} w="100%">
-              {actionData?.res?.name === "ExpiredCodeException" &&
-                !isSubmitting && (
-                  <Button onClick={handleResend} colorScheme="primary">
-                    Resend Code
-                  </Button>
+                {actionData?.res && !isSubmitting ? (
+                  <Alert status="error" rounded="md">
+                    <AlertIcon />
+                    <AlertTitle>{actionData?.res.message} </AlertTitle>
+                  </Alert>
+                ) : isSubmitting ? (
+                  <Spinner size="xl" />
+                ) : (
+                  <Alert status="info" rounded="md">
+                    <AlertIcon />
+                    <AlertTitle>
+                      A one time pin was sent to your email. Please enter the
+                      code.
+                    </AlertTitle>
+                  </Alert>
                 )}
+              </VStack>
 
-              <Text>
-                Account already verified?&nbsp;
-                <Text
-                  as={Link}
-                  to="/login"
-                  fontSize={{ base: "md", sm: "md" }}
-                  fontWeight="bold"
-                  _hover={{ textDecoration: "underline" }}
-                >
-                  Sign In
+              <VStack spacing={4} w="100%">
+                {actionData?.res?.name === "ExpiredCodeException" &&
+                  !isSubmitting && (
+                    <Button onClick={handleResend} colorScheme="primary">
+                      Resend Code
+                    </Button>
+                  )}
+
+                <Text>
+                  Account already verified?&nbsp;
+                  <Text
+                    as={Link}
+                    to="/login"
+                    fontSize={{ base: "md", sm: "md" }}
+                    fontWeight="bold"
+                    _hover={{ textDecoration: "underline" }}
+                  >
+                    Sign In
+                  </Text>
                 </Text>
-              </Text>
+              </VStack>
             </VStack>
-          </VStack>
-        </Stack>
-      </Center>
-      {/* <EmailModal /> */}
-    </Container>
+          </Stack>
+        </Center>
+        {/* <EmailModal /> */}
+      </Container>
+    </SlideFade>
   );
 }
 

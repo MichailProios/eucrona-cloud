@@ -20,6 +20,7 @@ import {
   AlertIcon,
   AlertTitle,
   AlertDescription,
+  SlideFade,
 } from "@chakra-ui/react";
 
 import type { LoaderFunction } from "@remix-run/node";
@@ -219,99 +220,105 @@ export default function Login() {
   const loaderData = useLoaderData();
 
   return (
-    <Container maxW="7xl" p={{ base: 5, md: 10 }}>
-      <Center>
-        <Stack
-          spacing={4}
-          as={ValidatedForm}
-          validator={validator}
-          method="post"
-          id="loginForm"
-          replace
-        >
-          <Stack align="center">
-            <Heading fontSize="2xl">Sign In to your Account</Heading>
-          </Stack>
-          <VStack
-            boxSize={{ base: "xs", sm: "sm", md: "md" }}
-            h="max-content !important"
-            bg={useColorModeValue("white", "gray.700")}
-            rounded="xl"
-            boxShadow={"2xl"}
-            p={{ base: 5, sm: 10 }}
-            spacing={8}
+    <SlideFade in={true} reverse delay={0.1}>
+      <Container maxW="7xl" p={{ base: 5, md: 10 }}>
+        <Center>
+          <Stack
+            spacing={4}
+            as={ValidatedForm}
+            validator={validator}
+            method="post"
+            id="loginForm"
+            replace
           >
-            <VStack spacing={4} w="100%">
-              <EmailTextField
-                label="Email Address"
-                name="emailAddress"
-                placeholder="Enter your email"
-                rounded="md"
-                type="email"
-              />
+            <Stack align="center">
+              <Heading fontSize="2xl">Sign In to your Account</Heading>
+            </Stack>
+            <VStack
+              boxSize={{ base: "xs", sm: "sm", md: "md" }}
+              h="max-content !important"
+              bg={useColorModeValue("white", "gray.700")}
+              rounded="xl"
+              boxShadow={"2xl"}
+              p={{ base: 5, sm: 10 }}
+              spacing={8}
+            >
+              <VStack spacing={4} w="100%">
+                <EmailTextField
+                  label="Email Address"
+                  name="emailAddress"
+                  placeholder="Enter your email"
+                  rounded="md"
+                  type="email"
+                />
 
-              <PasswordTextField
-                label="Password"
-                name="password"
-                placeholder="Enter your password"
-                rounded="md"
-              />
-              {actionData?.res && (
-                <Alert status="error" rounded="md">
-                  <AlertIcon />
-                  <AlertTitle>{actionData?.res?.message}</AlertTitle>
-                </Alert>
-              )}
-              {loaderData !== null && (
-                <Alert status="success" rounded="md">
-                  <AlertIcon />
-                  <AlertTitle>
-                    Account verification successful! Please login with your
-                    credentials.
-                  </AlertTitle>
-                </Alert>
-              )}
-            </VStack>
-            <VStack w="100%" spacing={4}>
-              <Stack direction="row" justify="space-between" w="100%">
-                {/* <Checkbox colorScheme="primary" size="md">
+                <PasswordTextField
+                  label="Password"
+                  name="password"
+                  placeholder="Enter your password"
+                  rounded="md"
+                />
+                {actionData?.res && (
+                  <Alert status="error" rounded="md">
+                    <AlertIcon />
+                    <AlertTitle>{actionData?.res?.message}</AlertTitle>
+                  </Alert>
+                )}
+                {loaderData !== null && (
+                  <Alert status="success" rounded="md">
+                    <AlertIcon />
+                    <AlertTitle>
+                      Account verification successful! Please login with your
+                      credentials.
+                    </AlertTitle>
+                  </Alert>
+                )}
+              </VStack>
+              <VStack w="100%" spacing={4}>
+                <Stack direction="row" justify="space-between" w="100%">
+                  {/* <Checkbox colorScheme="primary" size="md">
                   Remember me
                 </Checkbox> */}
-                <CheckBox type="checkbox" name="remember" label="Remember me" />
-                <Text
-                  as={Link}
-                  to="/forgot"
-                  fontSize={{ base: "md", sm: "md" }}
-                  // fontWeight="bold"
-                  _hover={{ textDecoration: "underline" }}
-                >
-                  Forgot Password?
-                </Text>
-              </Stack>
+                  <CheckBox
+                    type="checkbox"
+                    name="remember"
+                    label="Remember me"
+                  />
+                  <Text
+                    as={Link}
+                    to="/forgot"
+                    fontSize={{ base: "md", sm: "md" }}
+                    // fontWeight="bold"
+                    _hover={{ textDecoration: "underline" }}
+                  >
+                    Forgot Password?
+                  </Text>
+                </Stack>
 
-              <SubmitButton
-                w="100%"
-                colorScheme="primary"
-                label="Sign In"
-                type="submit"
-              />
+                <SubmitButton
+                  w="100%"
+                  colorScheme="primary"
+                  label="Sign In"
+                  type="submit"
+                />
 
-              <Text>
-                Don't have an account?&nbsp;
-                <Text
-                  as={Link}
-                  to="/register"
-                  fontSize={{ base: "md", sm: "md" }}
-                  fontWeight="bold"
-                  _hover={{ textDecoration: "underline" }}
-                >
-                  Register
+                <Text>
+                  Don't have an account?&nbsp;
+                  <Text
+                    as={Link}
+                    to="/register"
+                    fontSize={{ base: "md", sm: "md" }}
+                    fontWeight="bold"
+                    _hover={{ textDecoration: "underline" }}
+                  >
+                    Register
+                  </Text>
                 </Text>
-              </Text>
+              </VStack>
             </VStack>
-          </VStack>
-        </Stack>
-      </Center>
-    </Container>
+          </Stack>
+        </Center>
+      </Container>
+    </SlideFade>
   );
 }

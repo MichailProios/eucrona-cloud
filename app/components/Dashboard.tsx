@@ -37,8 +37,6 @@ import {
   Stack,
   useBoolean,
   SlideFade,
-  Slide,
-  ScaleFade,
 } from "@chakra-ui/react";
 
 import { Form, NavLink, useLoaderData, useTransition } from "@remix-run/react";
@@ -73,18 +71,6 @@ interface NavbarProps {
 }
 
 export default function Dashboard({ children }: NavbarProps) {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const btnRef = useRef<HTMLButtonElement>(null);
-  const { colorMode, toggleColorMode } = useColorMode();
-
-  const breakpoint = useBreakpoint({ ssr: true });
-
-  useEffect(() => {
-    if (breakpoint === "lg") {
-      onClose();
-    }
-  }, [breakpoint, onClose]);
-
   return (
     <>
       <Sidebar>{children}</Sidebar>
@@ -99,10 +85,18 @@ interface SidebarProps extends BoxProps {
 
 const Sidebar = ({ children, ...rest }: SidebarProps) => {
   const { colorMode, toggleColorMode } = useColorMode();
-  const [sidebar, setSidebar] = useBoolean();
+  const [sidebar, setSidebar] = useBoolean(false);
   const transition = useTransition();
   const { height } = useWindowDimensions();
   const breakpoint = useBreakpoint({ ssr: true });
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const btnRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (breakpoint === "md") {
+      onClose();
+    }
+  }, [breakpoint, onClose]);
 
   useEffect(() => {
     if (breakpoint === "lg" || breakpoint === "md") {
@@ -113,11 +107,7 @@ const Sidebar = ({ children, ...rest }: SidebarProps) => {
   }, [breakpoint, setSidebar]);
 
   return (
-    <Flex
-      flexDirection="row"
-      justifyContent="flex-start"
-      display={{ sm: "none", md: "flex" }}
-    >
+    <Flex flexDirection="row" justifyContent="flex-start">
       <Box
         transition="0.3s ease"
         zIndex={850}
@@ -128,14 +118,14 @@ const Sidebar = ({ children, ...rest }: SidebarProps) => {
         w={sidebar ? "60px" : "240px"}
         position="fixed"
         h="full"
-        display="flex"
         flexDirection={"column"}
         justifyContent="center"
         {...rest}
+        display={{ base: "none", md: "flex" }}
       >
         <Flex h={16} alignItems="center" justifyContent="center">
           <HStack direction={"row"} align="center" spacing={sidebar ? 0 : 4}>
-            <SlideFade in={!sidebar} reverse>
+            <SlideFade in={!sidebar} reverse delay={0.2}>
               <NavLink
                 to={"/"}
                 draggable={false}
@@ -155,7 +145,7 @@ const Sidebar = ({ children, ...rest }: SidebarProps) => {
                 </Box>
               </NavLink>
             </SlideFade>
-            <SlideFade in={sidebar} reverse>
+            <SlideFade in={sidebar} reverse delay={0.2}>
               <NavLink
                 to={"/"}
                 draggable={false}
@@ -199,8 +189,19 @@ const Sidebar = ({ children, ...rest }: SidebarProps) => {
         </Box>
       </Box>
 
-      <Box w={"100%"}>
-        <Header colorMode={colorMode} toggleColorMode={toggleColorMode} />
+      <Box
+        w={"100%"}
+        display={{ base: "none", md: "flex" }}
+        flexDirection="column"
+      >
+        <Header
+          colorMode={colorMode}
+          toggleColorMode={toggleColorMode}
+          isOpen={isOpen}
+          onOpen={onOpen}
+          onClose={onClose}
+          btnRef={btnRef}
+        />
         <Progress
           isIndeterminate
           width={"100%"}
@@ -224,6 +225,48 @@ const Sidebar = ({ children, ...rest }: SidebarProps) => {
           {children}
         </Box>
       </Box>
+
+      <Box
+        w={"100%"}
+        display={{ base: "flex", md: "none" }}
+        flexDirection="column"
+      >
+        <Header
+          colorMode={colorMode}
+          toggleColorMode={toggleColorMode}
+          isOpen={isOpen}
+          onOpen={onOpen}
+          onClose={onClose}
+          btnRef={btnRef}
+        />
+        <Progress
+          isIndeterminate
+          width={"100%"}
+          display={transition.state !== "idle" ? "flex" : "none"}
+          size="xs"
+          position="fixed"
+          top={"64px"}
+          zIndex={800}
+          backgroundColor="transparent"
+          colorScheme={"primary"}
+        />
+        <Box
+          transition="0.3s ease"
+          display={"flex"}
+          flexDirection={"column"}
+          justifyContent="flex-start"
+          minHeight={height ? `calc(${height}px - 64px)` : `calc(100vh - 64px)`}
+        >
+          {children}
+        </Box>
+      </Box>
+
+      <SidebarDrawer
+        isOpen={isOpen}
+        onOpen={onOpen}
+        onClose={onClose}
+        btnRef={btnRef}
+      />
     </Flex>
   );
 };
@@ -231,9 +274,20 @@ const Sidebar = ({ children, ...rest }: SidebarProps) => {
 interface HeaderProps {
   colorMode: any;
   toggleColorMode: any;
+  isOpen: any;
+  onOpen: any;
+  onClose: any;
+  btnRef: any;
 }
 
-function Header({ colorMode, toggleColorMode }: HeaderProps) {
+function Header({
+  colorMode,
+  toggleColorMode,
+  isOpen,
+  onOpen,
+  onClose,
+  btnRef,
+}: HeaderProps) {
   return (
     <>
       <Flex
@@ -251,10 +305,29 @@ function Header({ colorMode, toggleColorMode }: HeaderProps) {
       >
         <Flex
           alignItems={"center"}
-          justifyContent={"flex-end"}
+          justifyContent={{ base: "space-between", md: "flex-end" }}
           w={"100%"}
           // maxW={"1920px"}
         >
+          <HStack spacing={4} display={{ base: "flex", md: "none" }}>
+            <IconButton aria-label="Open Drawer" ref={btnRef} onClick={onOpen}>
+              <HamburgerIcon />
+            </IconButton>
+            <SlideFade in={true} reverse delay={0.2}>
+              <NavLink to={"/"} prefetch="render" draggable={false}>
+                <Image
+                  objectFit="contain"
+                  h={"35px"}
+                  w={"auto"}
+                  src={LogoPlain}
+                  alt="Eucrona-Logo"
+                  draggable="false"
+                  loading="eager"
+                />
+              </NavLink>
+            </SlideFade>
+          </HStack>
+
           <HStack spacing={4}>
             <IconButton
               variant={"ghost"}
@@ -301,7 +374,7 @@ function UserMenu() {
             >
               <Text fontSize="sm">{user.data.UserId.payload.name}</Text>
               <Text fontSize="xs" color="gray.600">
-                Base
+                Basic User
               </Text>
             </VStack>
           </HStack>
@@ -316,5 +389,100 @@ function UserMenu() {
         </MenuList>
       </Menu>
     </Flex>
+  );
+}
+
+interface SidebarDrawerProps {
+  isOpen: any;
+  onOpen: any;
+  onClose: any;
+  btnRef: any;
+}
+
+function SidebarDrawer({
+  isOpen,
+  onOpen,
+  onClose,
+  btnRef,
+}: SidebarDrawerProps) {
+  return (
+    <Drawer
+      isOpen={isOpen}
+      placement="left"
+      size="xs"
+      onClose={onClose}
+      finalFocusRef={btnRef}
+    >
+      <DrawerOverlay />
+
+      <DrawerContent>
+        <DrawerCloseButton />
+        <DrawerHeader p={2} alignSelf="center">
+          <NavLink to={"/"} onClick={onClose} prefetch="render">
+            <Image
+              objectFit="contain"
+              h={50}
+              w={"auto"}
+              src={LogoPlain}
+              alt="Eucrona-Logo"
+              draggable="false"
+              loading="eager"
+            />
+          </NavLink>
+        </DrawerHeader>
+        <DrawerBody>
+          <VStack spacing="12px" align="stretch">
+            {/* {navigationLinks.map((link, index) => (
+              <NavLink
+                key={index}
+                to={link.url}
+                draggable="false"
+                prefetch="render"
+              >
+                {({ isActive }) => (
+                  <Button
+                    onClick={onClose}
+                    variant="ghost"
+                    isActive={isActive}
+                    w={"100%"}
+                  >
+                    {link.label}
+                  </Button>
+                )}
+              </NavLink>
+            ))} */}
+          </VStack>
+        </DrawerBody>
+
+        <DrawerFooter alignSelf="center" width={"100%"}>
+          {/* <VStack spacing="12px" width={"100%"}>
+            <Button
+              fontSize={"sm"}
+              width={"100%"}
+              fontWeight={400}
+              as={Link}
+              href="https://cloud.eucrona.com/login"
+              style={{ textDecoration: "none" }}
+              variant={"solid"}
+            >
+              Sign In
+            </Button>
+
+            <Button
+              width={"100%"}
+              fontSize={"sm"}
+              fontWeight={600}
+              variant="solid"
+              colorScheme={"primary"}
+              as={Link}
+              style={{ textDecoration: "none" }}
+              href="https://cloud.eucrona.com/register"
+            >
+              Sign Up
+            </Button>
+          </VStack> */}
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
   );
 }

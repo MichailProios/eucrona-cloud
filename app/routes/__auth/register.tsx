@@ -21,6 +21,7 @@ import {
   AlertIcon,
   AlertTitle,
   AlertDescription,
+  SlideFade,
 } from "@chakra-ui/react";
 
 import type { LoaderFunction } from "@remix-run/node";
@@ -232,103 +233,105 @@ export default function Register() {
   const actionData = useActionData();
 
   return (
-    <Container maxW="7xl" p={{ base: 5, md: 10 }}>
-      <Center>
-        <Stack
-          spacing={4}
-          as={ValidatedForm}
-          validator={validator}
-          method="post"
-          id="registerForm"
-          replace
-        >
-          <Stack align="center">
-            <Heading fontSize="2xl">Create Account</Heading>
-          </Stack>
-          <VStack
-            boxSize={{ base: "xs", sm: "sm", md: "md" }}
-            h="max-content !important"
-            bg={useColorModeValue("white", "gray.700")}
-            rounded="xl"
-            boxShadow={"2xl"}
-            p={{ base: 5, sm: 10 }}
-            spacing={8}
+    <SlideFade in={true} reverse delay={0.1}>
+      <Container maxW="7xl" p={{ base: 5, md: 10 }}>
+        <Center>
+          <Stack
+            spacing={4}
+            as={ValidatedForm}
+            validator={validator}
+            method="post"
+            id="registerForm"
+            replace
           >
-            <VStack spacing={4} w="100%">
-              <TextField
-                label="Full Name"
-                name="fullName"
-                placeholder="Enter your first and last name"
-                rounded="md"
-                type="text"
-              />
-              <TextField
-                label="Email Address"
-                name="emailAddress"
-                placeholder="Enter your email"
-                rounded="md"
-                type="email"
-              />
+            <Stack align="center">
+              <Heading fontSize="2xl">Create Account</Heading>
+            </Stack>
+            <VStack
+              boxSize={{ base: "xs", sm: "sm", md: "md" }}
+              h="max-content !important"
+              bg={useColorModeValue("white", "gray.700")}
+              rounded="xl"
+              boxShadow={"2xl"}
+              p={{ base: 5, sm: 10 }}
+              spacing={8}
+            >
+              <VStack spacing={4} w="100%">
+                <TextField
+                  label="Full Name"
+                  name="fullName"
+                  placeholder="Enter your first and last name"
+                  rounded="md"
+                  type="text"
+                />
+                <TextField
+                  label="Email Address"
+                  name="emailAddress"
+                  placeholder="Enter your email"
+                  rounded="md"
+                  type="email"
+                />
 
-              <PasswordTextField
-                label="Password"
-                name="password"
-                placeholder="Enter your password"
-                rounded="md"
-              />
-              <PasswordTextField
-                label="Confirm Password"
-                name="confirmPassword"
-                placeholder="Confirm your password"
-                rounded="md"
-              />
+                <PasswordTextField
+                  label="Password"
+                  name="password"
+                  placeholder="Enter your password"
+                  rounded="md"
+                />
+                <PasswordTextField
+                  label="Confirm Password"
+                  name="confirmPassword"
+                  placeholder="Confirm your password"
+                  rounded="md"
+                />
 
-              {actionData?.res && (
-                <Alert status="error" rounded="md">
-                  <AlertIcon />
-                  <AlertTitle>{actionData?.res?.message}</AlertTitle>
-                </Alert>
-              )}
+                {actionData?.res && (
+                  <Alert status="error" rounded="md">
+                    <AlertIcon />
+                    <AlertTitle>{actionData?.res?.message}</AlertTitle>
+                  </Alert>
+                )}
 
-              {actionData?.res?.name === "UsernameExistsException" && (
-                <Button
-                  as={Link}
-                  to={`/verify?emailAddress=${actionData?.res?.formData.emailAddress}`}
+                {actionData?.res?.name === "UsernameExistsException" && (
+                  <Button
+                    as={Link}
+                    to={`/verify?emailAddress=${actionData?.res?.formData.emailAddress}`}
+                    colorScheme="primary"
+                  >
+                    Verify Account
+                  </Button>
+                )}
+              </VStack>
+              <VStack w="100%" spacing={4}>
+                <CheckBox
+                  type="checkbox"
+                  name="agreed"
+                  label=" Agree with Terms & Conditions"
+                />
+
+                <SubmitButton
+                  w="100%"
                   colorScheme="primary"
-                >
-                  Verify Account
-                </Button>
-              )}
-            </VStack>
-            <VStack w="100%" spacing={4}>
-              <CheckBox
-                type="checkbox"
-                name="agreed"
-                label=" Agree with Terms & Conditions"
-              />
-
-              <SubmitButton
-                w="100%"
-                colorScheme="primary"
-                label="Create Account"
-                type="submit"
-              />
-              <Text>
-                Already have an account?&nbsp;
-                <Text
-                  as={Link}
-                  to="/login"
-                  fontSize={{ base: "md", sm: "md" }}
-                  fontWeight="bold"
-                  _hover={{ textDecoration: "underline" }}
-                >
-                  Sign In
+                  label="Create Account"
+                  type="submit"
+                />
+                <Text>
+                  Already have an account?&nbsp;
+                  <Text
+                    as={Link}
+                    to="/login"
+                    fontSize={{ base: "md", sm: "md" }}
+                    fontWeight="bold"
+                    _hover={{ textDecoration: "underline" }}
+                  >
+                    Sign In
+                  </Text>
                 </Text>
-              </Text>
+              </VStack>
             </VStack>
-          </VStack>
-        </Stack>
-      </Center>
-    </Container>
+          </Stack>
+        </Center>
+      </Container>
+    </SlideFade>
   );
 }

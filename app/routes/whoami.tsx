@@ -102,10 +102,15 @@ export default function Whoami() {
                 ISS: {user.data.UserId.payload.iss}
               </Text>
               <br />
-              <Text color={"gray.500"} maxW={"1200px"} align="center">
+              <Text
+                color={"gray.500"}
+                w={"100%"}
+                maxW={"1000px"}
+                align="center"
+              >
                 JWT Token
               </Text>
-              <Text color={"gray.500"} maxW={"1200px"}>
+              <Text color={"gray.500"} w={"100%"} maxW={"1000px"}>
                 {user.data.UserId.jwtToken}
               </Text>
             </Stack>
