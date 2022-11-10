@@ -358,7 +358,7 @@ function UserMenu() {
 
   return (
     <>
-      <Flex alignItems={"center"} display={{ base: "none", sm: "flex" }}>
+      <Flex alignItems={"center"} display={{ base: "none", xs: "flex" }}>
         <Menu>
           <MenuButton
             h={12}
@@ -397,7 +397,7 @@ function UserMenu() {
           </MenuList>
         </Menu>
       </Flex>
-      <Flex alignItems={"center"} display={{ base: "flex", sm: "none" }}>
+      <Flex alignItems={"center"} display={{ base: "flex", xs: "none" }}>
         <Menu>
           <MenuButton
             h={12}
