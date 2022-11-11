@@ -22,6 +22,7 @@ import {
   AlertTitle,
   AlertDescription,
   SlideFade,
+  HStack,
 } from "@chakra-ui/react";
 
 import type { LoaderFunction } from "@remix-run/node";
@@ -45,7 +46,9 @@ const passwordRegex = new RegExp(
 
 export const validator = withZod(
   z.object({
-    fullName: z.string().min(1, { message: "Full Name is required" }),
+    firstName: z.string().min(1, { message: "First Name is required" }),
+    lastName: z.string().min(1, { message: "Last Name is required" }),
+
     emailAddress: z
       .string()
       .min(1, { message: "Email Address is required" })
@@ -112,8 +115,14 @@ export async function action({ request }: { request: Request }) {
     return validationError(data.error);
   }
 
-  const { fullName, emailAddress, password, confirmPassword, agreed } =
-    data.data;
+  const {
+    firstName,
+    lastName,
+    emailAddress,
+    password,
+    confirmPassword,
+    agreed,
+  } = data.data;
 
   try {
     if (password !== confirmPassword) {
@@ -136,7 +145,7 @@ export async function action({ request }: { request: Request }) {
       };
     }
 
-    await auth.signUp(emailAddress, fullName, password);
+    await auth.signUp(emailAddress, firstName, lastName, password);
 
     return redirect(`/verify?emailAddress=${emailAddress}`);
   } catch (error: any) {
@@ -256,13 +265,22 @@ export default function Register() {
               spacing={8}
             >
               <VStack spacing={4} w="100%">
-                <TextField
-                  label="Full Name"
-                  name="fullName"
-                  placeholder="Enter your first and last name"
-                  rounded="md"
-                  type="text"
-                />
+                <Stack direction={{ base: "column", md: "row" }} w="100%">
+                  <TextField
+                    label="First Name"
+                    name="firstName"
+                    placeholder="Enter your first name"
+                    rounded="md"
+                    type="text"
+                  />
+                  <TextField
+                    label="Last Name"
+                    name="lastName"
+                    placeholder="Enter your last name"
+                    rounded="md"
+                    type="text"
+                  />
+                </Stack>
                 <TextField
                   label="Email Address"
                   name="emailAddress"

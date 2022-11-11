@@ -24,7 +24,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 
-import type { LoaderFunction } from "@remix-run/node";
+import type { LoaderFunction, MetaFunction } from "@remix-run/node";
 
 import * as auth from "app/utils/auth.server";
 import { Link } from "@remix-run/react";

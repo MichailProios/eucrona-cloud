@@ -67,7 +67,12 @@ function getCognitoUser(username: string) {
   return cognitoUser;
 }
 
-export async function signUp(username: string, name: string, password: string) {
+export async function signUp(
+  username: string,
+  firstName: string,
+  lastName: string,
+  password: string
+) {
   return new Promise(function (resolve, reject) {
     const attributeList = [
       new CognitoUserAttribute({
@@ -76,7 +81,15 @@ export async function signUp(username: string, name: string, password: string) {
       }),
       new CognitoUserAttribute({
         Name: "name",
-        Value: name,
+        Value: firstName + " " + lastName,
+      }),
+      new CognitoUserAttribute({
+        Name: "given_name",
+        Value: firstName,
+      }),
+      new CognitoUserAttribute({
+        Name: "family_name",
+        Value: lastName,
       }),
     ];
 
@@ -128,6 +141,7 @@ export async function signIn(
         );
       },
       onFailure: function (err: any) {
+        console.log(err);
         reject(err);
       },
     });
