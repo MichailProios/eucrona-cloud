@@ -31,6 +31,16 @@ const sessionCookie = createCookie("__session", {
   secure: process.env.NODE_ENV === "production",
 });
 
+function getCognitoUser(username: string) {
+  const userData = {
+    Username: username,
+    Pool: userPool,
+  };
+  const cognitoUser = new CognitoUser(userData);
+
+  return cognitoUser;
+}
+
 export const { getSession, commitSession, destroySession } =
   createArcTableSessionStorage({
     table: "sessions",
@@ -48,23 +58,29 @@ export async function isAuthenticated(request: Request) {
 export async function protectedRoute(request: Request) {
   const currentSession = await getSession(request.headers.get("Cookie"));
 
-  return currentSession.has("UserId") ? currentSession : redirect("/login");
+  if (!currentSession.has("UserId")) {
+    throw redirect("/login");
+  } else {
+    return null;
+  }
 }
 
 export async function unprotectedRoute(request: Request) {
   const currentSession = await getSession(request.headers.get("Cookie"));
 
-  return currentSession.has("UserId") ? redirect("/") : false;
+  if (currentSession.has("UserId")) {
+    throw redirect("/");
+  } else {
+    return null;
+  }
 }
 
-function getCognitoUser(username: string) {
-  const userData = {
-    Username: username,
-    Pool: userPool,
-  };
-  const cognitoUser = new CognitoUser(userData);
+export async function getUser(request: Request) {
+  const currentSession = await getSession(request.headers.get("Cookie"));
 
-  return cognitoUser;
+  const user = await currentSession.get("UserId");
+
+  return currentSession.has("UserId") ? user : null;
 }
 
 export async function signUp(
@@ -141,7 +157,6 @@ export async function signIn(
         );
       },
       onFailure: function (err: any) {
-        console.log(err);
         reject(err);
       },
     });

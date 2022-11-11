@@ -13,6 +13,7 @@ import {
   Spinner,
   Progress,
 } from "@chakra-ui/react";
+import { json, redirect } from "@remix-run/node";
 
 import { animateScroll as scroll } from "react-scroll";
 
@@ -57,25 +58,9 @@ const eucronaAccounts = [
   },
 ];
 
-// export const loader: LoaderFunction = async ({ request }: any) => {
-//   try {
-//     return await auth.isAuthenticated(request);
-//   } catch (error) {
-//     return "";
-//   }
-// };
-
 export default function Layout({ children }: LayoutProps) {
-  const [flag, setFlag] = useState(false);
   const { height } = useWindowDimensions();
-
   const showButton = useScrollButtonVisibility();
-
-  useEffect(() => {
-    if (ExecutionEnvironment.canUseDOM) {
-      setFlag(true);
-    }
-  }, [setFlag]);
 
   const handleScrollToTop = () => {
     if (ExecutionEnvironment.canUseDOM) {
@@ -115,7 +100,7 @@ export default function Layout({ children }: LayoutProps) {
           />
           <Progress
             isIndeterminate
-            display={transition.state !== "idle" ? "flex" : "none"}
+            display={transition?.state !== "idle" ? "flex" : "none"}
             size="xs"
             position="fixed"
             top={"64px"}

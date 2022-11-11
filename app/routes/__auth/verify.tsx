@@ -40,8 +40,8 @@ import { RepeatIcon } from "@chakra-ui/icons";
 
 export async function action({ request }: { request: Request }) {
   const data = await request.formData();
-  const url = new URL(request.url);
-  const emailAddress: any = url.searchParams.get("emailAddress");
+  const session = await auth.getSession(request.headers.get("Cookie"));
+  const emailAddress = session.get("registered-emailAddress") || null;
   const type: any = data.get("type");
   const otp: any = data.get("otp");
 
@@ -52,7 +52,13 @@ export async function action({ request }: { request: Request }) {
       case "verify": {
         await auth.verifyAccount(emailAddress, otp);
 
-        return redirect("/login?verificationSuccessful");
+        session.flash("verification-status", true);
+
+        return redirect("/login", {
+          headers: {
+            "Set-Cookie": await auth.commitSession(session),
+          },
+        });
       }
       case "resend": {
         return await auth.sendCode(emailAddress);
@@ -78,30 +84,21 @@ export const loader: LoaderFunction = async ({
 }: {
   request: Request;
 }) => {
-  const res = await auth.unprotectedRoute(request);
+  try {
+    await auth.unprotectedRoute(request);
 
-  if (res !== false) {
-    return res;
-  }
+    const session = await auth.getSession(request.headers.get("Cookie"));
+    const emailAddress = session.get("registered-emailAddress") || null;
 
-  const url = new URL(request.url);
-
-  const emailAddress: any = url.searchParams.get("emailAddress");
-
-  if (emailAddress) {
-    return emailAddress;
-  } else {
-    return redirect("/verify-identify");
+    if (emailAddress) {
+      return emailAddress;
+    } else {
+      return redirect("/verify-identify");
+    }
+  } catch (error) {
+    return error;
   }
 };
-
-// export const loader: LoaderFunction = async ({ request }: any) => {
-//   try {
-//     return await auth.unprotectedRoute(request);
-//   } catch (error) {
-//     return error;
-//   }
-// };
 
 export default function Verify() {
   const actionData = useActionData();
@@ -109,6 +106,8 @@ export default function Verify() {
   const submit = useSubmit();
   const isSubmitting: any = useTransition().submission;
   const emailAddress = useLoaderData();
+
+  // console.log(emailAddress);
 
   function handleResend() {
     const formData = new FormData();
@@ -182,8 +181,7 @@ export default function Verify() {
                   <Alert status="info" rounded="md">
                     <AlertIcon />
                     <AlertTitle>
-                      A one time pin was sent to your email. Please enter the
-                      code.
+                      A one time pin was sent to {emailAddress}.
                     </AlertTitle>
                   </Alert>
                 )}

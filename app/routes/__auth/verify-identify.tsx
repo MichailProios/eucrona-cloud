@@ -70,7 +70,14 @@ export async function action({ request }: { request: Request }) {
 
   try {
     await auth.sendCode(emailAddress);
-    return redirect(`/verify?emailAddress=${emailAddress}`);
+
+    const session = await auth.getSession(request.headers.get("Cookie"));
+    session.flash("registered-emailAddress", emailAddress);
+    return redirect("/verify", {
+      headers: {
+        "Set-Cookie": await auth.commitSession(session),
+      },
+    });
   } catch (error: any) {
     if (error.name && error.message) {
       return { res: { name: error.name, message: error.message } };
@@ -87,33 +94,10 @@ export const loader: LoaderFunction = async ({
 }: {
   request: Request;
 }) => {
-  const res = await auth.unprotectedRoute(request);
-
-  if (res !== false) {
-    return res;
-  }
-
-  const url = new URL(request.url);
-
-  const emailAddress: any = url.searchParams.get("emailAddress");
-
-  if (emailAddress) {
-    return redirect(`/verify?emailAddress=${emailAddress}`);
-  } else {
-    return null;
-  }
-
-  function TextField(props: any) {
-    const { error, getInputProps } = useField(props.name);
-    const isSubmitting = useIsSubmitting();
-
-    return (
-      <FormControl id={props.name} isInvalid={error ? true : false}>
-        <FormLabel>{props.label}</FormLabel>
-        <Input {...props} {...getInputProps()} isReadOnly={isSubmitting} />
-        <FormErrorMessage>{error}</FormErrorMessage>
-      </FormControl>
-    );
+  try {
+    return await auth.unprotectedRoute(request);
+  } catch (error) {
+    return error;
   }
 };
 
@@ -129,6 +113,19 @@ function TextField(props: any) {
     </FormControl>
   );
 }
+
+// function TextField(props: any) {
+//   const { error, getInputProps } = useField(props.name);
+//   const isSubmitting = useIsSubmitting();
+
+//   return (
+//     <FormControl id={props.name} isInvalid={error ? true : false}>
+//       <FormLabel>{props.label}</FormLabel>
+//       <Input {...props} {...getInputProps()} isReadOnly={isSubmitting} />
+//       <FormErrorMessage>{error}</FormErrorMessage>
+//     </FormControl>
+//   );
+// }
 
 function SubmitButton(props: any) {
   const isSubmitting = useIsSubmitting();

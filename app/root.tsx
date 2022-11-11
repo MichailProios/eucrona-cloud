@@ -55,20 +55,23 @@ interface DocumentProps {
   children: React.ReactNode;
 }
 
-export const action = async ({ request }: any) => {
-  try {
-    return await auth.signOut(request);
-  } catch (error) {
-    return "";
-  }
-};
-
 export const loader: LoaderFunction = async ({ request }) => {
   try {
     const isAuthRes = await auth.isAuthenticated(request);
-    const userRes = await auth.getSession(request.headers.get("Cookie"));
+    const userRes = await auth.getUser(request);
 
-    return json({ isAuthenticated: isAuthRes, user: userRes });
+    return {
+      isAuthenticated: isAuthRes,
+      user: userRes,
+    };
+  } catch (error: any) {
+    return error;
+  }
+};
+
+export const action = async ({ request }: any) => {
+  try {
+    return await auth.signOut(request);
   } catch (error) {
     return "";
   }
@@ -79,17 +82,13 @@ const Document = withEmotionCache(
     const serverStyleData = useContext(ServerStyleContext);
     const clientStyleData = useContext(ClientStyleContext);
 
-    // Only executed on client
     useEffect(() => {
-      // re-link sheet container
       emotionCache.sheet.container = document.head;
-      // re-inject tags
       const tags = emotionCache.sheet.tags;
       emotionCache.sheet.flush();
       tags.forEach((tag) => {
         (emotionCache.sheet as any)._insertTag(tag);
       });
-      // reset cache to reapply global styles
       clientStyleData?.reset();
     }, []);
 

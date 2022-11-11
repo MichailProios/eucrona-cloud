@@ -75,39 +75,6 @@ export const validator = withZod(
   })
 );
 
-// export const loader: LoaderFunction = async ({ request }) => {
-//!Register
-// const res = await utils.signUp(
-//   "mproios12@eucrona.com",
-//   "name",
-//   "!Mike32083705"
-// );
-//!Sign In
-// const res = await utils.signIn(
-//   request,
-//   "mproios12@eucrona.com",
-//   "!Mike32083705"
-// );
-//!Verify
-// const res = await utils.verifyAccount("mproios12@eucrona.com", "559423");
-
-//!Send Code
-// const res = await utils.sendCode("mproios12@eucrona.com");
-//!Forgot Password
-// const res = await utils.forgotPassword(
-//   "mproios1@eucrona.com",
-//   "924445",
-//   "!Mike32083705"
-// );
-//!Log Out
-// const res = await utils.signOut(request);
-
-//!GetSession
-// const res = await utils.getSession(request);
-
-//   return "s";
-// };
-
 export async function action({ request }: { request: Request }) {
   const data = await validator.validate(await request.formData());
 
@@ -147,7 +114,15 @@ export async function action({ request }: { request: Request }) {
 
     await auth.signUp(emailAddress, firstName, lastName, password);
 
-    return redirect(`/verify?emailAddress=${emailAddress}`);
+    const session = await auth.getSession(request.headers.get("Cookie"));
+
+    session.flash("registered-emailAddress", emailAddress);
+
+    return redirect("/verify", {
+      headers: {
+        "Set-Cookie": await auth.commitSession(session),
+      },
+    });
   } catch (error: any) {
     if (error.name && error.message) {
       return {
@@ -312,7 +287,7 @@ export default function Register() {
                 {actionData?.res?.name === "UsernameExistsException" && (
                   <Button
                     as={Link}
-                    to={`/verify?emailAddress=${actionData?.res?.formData.emailAddress}`}
+                    to={`/verify-identify`}
                     colorScheme="primary"
                   >
                     Verify Account

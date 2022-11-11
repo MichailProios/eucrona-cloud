@@ -22,6 +22,7 @@ import {
   AlertDescription,
   SlideFade,
 } from "@chakra-ui/react";
+import { json } from "@remix-run/node"; // or cloudflare/deno
 
 import type { LoaderFunction } from "@remix-run/node";
 
@@ -54,53 +55,19 @@ export const validator = withZod(
   })
 );
 
-// export const loader: LoaderFunction = async ({ request }) => {
-//!Register
-// const res = await utils.signUp(
-//   "mproios12@eucrona.com",
-//   "name",
-//   "!Mike32083705"
-// );
-//!Sign In
-// const res = await utils.signIn(
-//   request,
-//   "mproios12@eucrona.com",
-//   "!Mike32083705"
-// );
-//!Verify
-// const res = await utils.verifyAccount("mproios12@eucrona.com", "559423");
-
-//!Send Code
-// const res = await utils.sendCode("mproios12@eucrona.com");
-//!Forgot Password
-// const res = await utils.forgotPassword(
-//   "mproios1@eucrona.com",
-//   "924445",
-//   "!Mike32083705"
-// );
-//!Log Out
-// const res = await utils.signOut(request);
-
-//!GetSession
-// const res = await utils.getSession(request);
-
-//   return "s";
-// };
-
-export const loader: LoaderFunction = async ({ request }: any) => {
+export const loader: LoaderFunction = async ({ request, test }: any) => {
   try {
-    const res = await auth.unprotectedRoute(request);
+    await auth.unprotectedRoute(request);
 
-    if (!res) {
-      const url = new URL(request.url);
-      const loginInstructions: any = url.searchParams.get(
-        "verificationSuccessful"
-      );
+    const session = await auth.getSession(request.headers.get("Cookie"));
+    const verificationStatus = session.get("verification-status") || null;
 
-      return loginInstructions;
-    }
-
-    return res;
+    return json(
+      { verificationStatus },
+      {
+        headers: { "Set-Cookie": await auth.commitSession(session) },
+      }
+    );
   } catch (error) {
     return error;
   }
@@ -217,7 +184,7 @@ function SubmitButton(props: any) {
 
 export default function Login() {
   const actionData = useActionData();
-  const loaderData = useLoaderData();
+  const { verificationStatus } = useLoaderData();
 
   return (
     <SlideFade in={true} reverse delay={0.1}>
@@ -265,7 +232,7 @@ export default function Login() {
                   </Alert>
                 )}
 
-                {loaderData !== null && (
+                {verificationStatus && (
                   <Alert status="success" rounded="md">
                     <AlertIcon />
                     <AlertTitle>

@@ -1,8 +1,6 @@
-import { ReactNode, useEffect, useRef, forwardRef, Children } from "react";
+import { useEffect, useRef } from "react";
 
 import {
-  Show,
-  Spinner,
   Flex,
   Image,
   HStack,
@@ -18,27 +16,22 @@ import {
   DrawerContent,
   useDisclosure,
   DrawerHeader,
-  Link,
   DrawerCloseButton,
   useBreakpoint,
   Box,
   Avatar,
-  CloseButton,
-  Icon,
   Text,
-  BoxProps,
-  FlexProps,
   Menu,
   MenuButton,
   MenuDivider,
   MenuItem,
   MenuList,
   Progress,
-  Stack,
   useBoolean,
   SlideFade,
-  Center,
 } from "@chakra-ui/react";
+
+import type { BoxProps } from "@chakra-ui/react";
 
 import { Form, NavLink, useLoaderData, useTransition } from "@remix-run/react";
 
@@ -99,14 +92,6 @@ const Sidebar = ({ children, ...rest }: SidebarProps) => {
     }
   }, [breakpoint, onClose]);
 
-  useEffect(() => {
-    if (breakpoint === "lg" || breakpoint === "md") {
-      setSidebar.on();
-    } else {
-      setSidebar.off();
-    }
-  }, [breakpoint, setSidebar]);
-
   return (
     <Flex flexDirection="row" justifyContent="flex-start">
       <Box
@@ -126,7 +111,7 @@ const Sidebar = ({ children, ...rest }: SidebarProps) => {
       >
         <Flex h={16} alignItems="center" justifyContent="center">
           <HStack direction={"row"} align="center" spacing={sidebar ? 0 : 4}>
-            <SlideFade in={!sidebar} reverse delay={0.2}>
+            <SlideFade in={!sidebar} reverse delay={0.3}>
               <NavLink
                 to={"/"}
                 draggable={false}
@@ -146,7 +131,7 @@ const Sidebar = ({ children, ...rest }: SidebarProps) => {
                 </Box>
               </NavLink>
             </SlideFade>
-            <SlideFade in={sidebar} reverse delay={0.2}>
+            <SlideFade in={sidebar} reverse delay={0.3}>
               <NavLink
                 to={"/"}
                 draggable={false}
@@ -314,7 +299,7 @@ function Header({
             <IconButton aria-label="Open Drawer" ref={btnRef} onClick={onOpen}>
               <HamburgerIcon />
             </IconButton>
-            <SlideFade in={true} reverse delay={0.2}>
+            <SlideFade in={true} reverse delay={0.3}>
               <NavLink to={"/"} prefetch="render" draggable={false}>
                 <Image
                   objectFit="contain"
@@ -376,7 +361,7 @@ function UserMenu() {
                 spacing="1px"
                 ml="2"
               >
-                <Text fontSize="sm">{user.data.UserId.payload.name}</Text>
+                <Text fontSize="sm">{user.payload.name}</Text>
                 <Text fontSize="xs" color="gray.600">
                   Basic User
                 </Text>
@@ -414,7 +399,7 @@ function UserMenu() {
                 spacing="1px"
                 ml="2"
               >
-                <Text fontSize="sm">{user.data.UserId.payload.name}</Text>
+                <Text fontSize="sm">{user.payload.name}</Text>
                 <Text fontSize="xs" color="gray.600">
                   Basic User
                 </Text>

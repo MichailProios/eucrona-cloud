@@ -1,28 +1,5 @@
 import { Fragment } from "react";
-import {
-  chakra,
-  Container,
-  Stack,
-  Text,
-  useColorModeValue,
-  Button,
-  Icon,
-  HStack,
-  SimpleGrid,
-  Flex,
-  Box,
-  Heading,
-  Input,
-  FormControl,
-  FormErrorMessage,
-  Alert,
-  AlertIcon,
-  AlertTitle,
-  Avatar,
-  Center,
-  Image,
-  VStack,
-} from "@chakra-ui/react";
+import { Text, Button, Center, Image, VStack } from "@chakra-ui/react";
 
 import type { LoaderFunction, MetaFunction } from "@remix-run/node";
 
@@ -33,7 +10,7 @@ export const loader: LoaderFunction = async ({ request }: any) => {
   try {
     return await auth.protectedRoute(request);
   } catch (error) {
-    return "";
+    return error;
   }
 };
 
