@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { ReactText, useEffect, useRef } from "react";
 
 import {
   Flex,
@@ -29,22 +29,24 @@ import {
   Progress,
   useBoolean,
   SlideFade,
+  Icon,
+  Link,
 } from "@chakra-ui/react";
 
-import type { BoxProps } from "@chakra-ui/react";
+import type { BoxProps, FlexProps } from "@chakra-ui/react";
 
 import { Form, NavLink, useLoaderData, useTransition } from "@remix-run/react";
 
-// import {
-//   FiHome,
-//   FiTrendingUp,
-//   FiCompass,
-//   FiStar,
-//   FiSettings,
-//   FiMenu,
-//   FiBell,
-//   FiChevronDown,
-// } from "react-icons/fi";
+import {
+  FiHome,
+  FiTrendingUp,
+  FiCompass,
+  FiStar,
+  FiSettings,
+  FiMenu,
+  FiBell,
+  FiChevronDown,
+} from "react-icons/fi";
 
 import {
   HamburgerIcon,
@@ -59,7 +61,19 @@ import {
 import LogoSideways from "public/logos/Logo-Sideways.svg";
 import LogoPlain from "public/logos/Logo-Plain.svg";
 import { useWindowDimensions } from "~/utils/hooks";
+import { IconType } from "react-icons/lib";
 
+interface LinkItemProps {
+  name: string;
+  icon: IconType;
+}
+const LinkItems: Array<LinkItemProps> = [
+  { name: "Home", icon: FiHome },
+  { name: "Trending", icon: FiTrendingUp },
+  { name: "Explore", icon: FiCompass },
+  { name: "Favourites", icon: FiStar },
+  { name: "Settings", icon: FiSettings },
+];
 interface NavbarProps {
   children: any;
 }
@@ -152,6 +166,31 @@ const Sidebar = ({ children, ...rest }: SidebarProps) => {
             </SlideFade>
           </HStack>
         </Flex>
+
+        <Box display={!sidebar ? "flex" : "none"} flexDirection="column">
+          {LinkItems.map((link, index) => (
+            <SlideFade
+              in={!sidebar}
+              key={link.name}
+              reverse
+              delay={index * 0.1}
+            >
+              <NavItem icon={link.icon}>{link.name}</NavItem>
+            </SlideFade>
+          ))}
+        </Box>
+
+        <Box
+          display={sidebar ? "flex" : "none"}
+          alignItems="center"
+          flexDirection="column"
+        >
+          {LinkItems.map((link, index) => (
+            <SlideFade in={sidebar} key={link.name} reverse delay={index * 0.1}>
+              <NavItem2 icon={link.icon} />
+            </SlideFade>
+          ))}
+        </Box>
 
         <Box
           display="flex"
@@ -465,8 +504,8 @@ function SidebarDrawer({
           </NavLink>
         </DrawerHeader>
         <DrawerBody>
-          <VStack spacing="12px" align="stretch">
-            {/* {navigationLinks.map((link, index) => (
+          {/* <VStack spacing="12px" align="stretch"> */}
+          {/* {navigationLinks.map((link, index) => (
               <NavLink
                 key={index}
                 to={link.url}
@@ -485,7 +524,17 @@ function SidebarDrawer({
                 )}
               </NavLink>
             ))} */}
-          </VStack>
+          {/* </VStack> */}
+
+          <Box>
+            {LinkItems.map((link, index) => (
+              // <SlideFade in={true} reverse delay={index * 0.1}>
+              <NavItem key={link.name} icon={link.icon}>
+                {link.name}
+              </NavItem>
+              // </SlideFade>
+            ))}
+          </Box>
         </DrawerBody>
 
         <DrawerFooter alignSelf="center" width={"100%"}>
@@ -520,3 +569,72 @@ function SidebarDrawer({
     </Drawer>
   );
 }
+
+interface NavItemProps extends FlexProps {
+  icon: IconType;
+  children: ReactText;
+}
+const NavItem = ({ icon, children, ...rest }: NavItemProps) => {
+  return (
+    <Link href="#" style={{ textDecoration: "none" }}>
+      <Flex
+        align="center"
+        p="4"
+        mx="2"
+        borderRadius="lg"
+        role="group"
+        cursor="pointer"
+        _hover={{
+          bg: "cyan.400",
+          color: "white",
+        }}
+        {...rest}
+      >
+        {icon && (
+          <Icon
+            mr="4"
+            fontSize="16"
+            _groupHover={{
+              color: "white",
+            }}
+            as={icon}
+          />
+        )}
+        {children}
+      </Flex>
+    </Link>
+  );
+};
+
+interface NavItemProps2 extends FlexProps {
+  icon: IconType;
+}
+const NavItem2 = ({ icon, children, ...rest }: NavItemProps2) => {
+  return (
+    <Link href="#" style={{ textDecoration: "none" }}>
+      <Flex
+        align="center"
+        p="4"
+        borderRadius="lg"
+        role="group"
+        cursor="pointer"
+        _hover={{
+          bg: "cyan.400",
+          color: "white",
+        }}
+        {...rest}
+      >
+        {icon && (
+          <Icon
+            // mr="4"
+            fontSize="16"
+            _groupHover={{
+              color: "white",
+            }}
+            as={icon}
+          />
+        )}
+      </Flex>
+    </Link>
+  );
+};
