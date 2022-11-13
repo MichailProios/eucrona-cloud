@@ -39,6 +39,7 @@ import { withZod } from "@remix-validated-form/with-zod";
 import { z } from "zod";
 
 import * as auth from "app/utils/auth.server";
+import * as cookie from "app/utils/cookie.server";
 import { useActionData } from "@remix-run/react";
 
 export const validator = withZod(
@@ -59,13 +60,13 @@ export const loader: LoaderFunction = async ({ request, test }: any) => {
   try {
     await auth.unprotectedRoute(request);
 
-    const session = await auth.getSession(request.headers.get("Cookie"));
+    const session = await cookie.getSession(request.headers.get("Cookie"));
     const verificationStatus = session.get("verification-status") || null;
 
     return json(
       { verificationStatus },
       {
-        headers: { "Set-Cookie": await auth.commitSession(session) },
+        headers: { "Set-Cookie": await cookie.commitSession(session) },
       }
     );
   } catch (error) {

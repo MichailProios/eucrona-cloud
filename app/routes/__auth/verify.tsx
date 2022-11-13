@@ -26,6 +26,8 @@ import { redirect } from "@remix-run/node";
 import type { LoaderFunction } from "@remix-run/node";
 
 import * as auth from "app/utils/auth.server";
+import * as cookie from "app/utils/cookie.server";
+
 import {
   Form,
   Link,
@@ -40,7 +42,7 @@ import { RepeatIcon } from "@chakra-ui/icons";
 
 export async function action({ request }: { request: Request }) {
   const data = await request.formData();
-  const session = await auth.getSession(request.headers.get("Cookie"));
+  const session = await cookie.getSession(request.headers.get("Cookie"));
   const emailAddress = session.get("registered-emailAddress") || null;
   const type: any = data.get("type");
   const otp: any = data.get("otp");
@@ -56,7 +58,7 @@ export async function action({ request }: { request: Request }) {
 
         return redirect("/login", {
           headers: {
-            "Set-Cookie": await auth.commitSession(session),
+            "Set-Cookie": await cookie.commitSession(session),
           },
         });
       }
@@ -87,7 +89,7 @@ export const loader: LoaderFunction = async ({
   try {
     await auth.unprotectedRoute(request);
 
-    const session = await auth.getSession(request.headers.get("Cookie"));
+    const session = await cookie.getSession(request.headers.get("Cookie"));
     const emailAddress = session.get("registered-emailAddress") || null;
 
     if (emailAddress) {

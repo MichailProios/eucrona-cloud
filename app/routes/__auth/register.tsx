@@ -38,6 +38,8 @@ import { z } from "zod";
 import { redirect } from "@remix-run/node";
 
 import * as auth from "app/utils/auth.server";
+import * as cookie from "app/utils/cookie.server";
+
 import { Link, useActionData } from "@remix-run/react";
 
 const passwordRegex = new RegExp(
@@ -114,13 +116,13 @@ export async function action({ request }: { request: Request }) {
 
     await auth.signUp(emailAddress, firstName, lastName, password);
 
-    const session = await auth.getSession(request.headers.get("Cookie"));
+    const session = await cookie.getSession(request.headers.get("Cookie"));
 
     session.flash("registered-emailAddress", emailAddress);
 
     return redirect("/verify", {
       headers: {
-        "Set-Cookie": await auth.commitSession(session),
+        "Set-Cookie": await cookie.commitSession(session),
       },
     });
   } catch (error: any) {
