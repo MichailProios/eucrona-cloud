@@ -2,8 +2,9 @@ import React, { useContext, useEffect } from "react";
 import { withEmotionCache } from "@emotion/react";
 import { ChakraProvider } from "@chakra-ui/react";
 import { json, redirect } from "@remix-run/node";
+import { useDataRefresh } from "remix-utils";
 
-import { useCatch, useLoaderData } from "@remix-run/react";
+import { useCatch, useLoaderData, useMatches } from "@remix-run/react";
 
 import type { LoaderFunction } from "@remix-run/node";
 
@@ -65,7 +66,7 @@ export const loader: LoaderFunction = async ({ request }) => {
       user: userRes,
     };
   } catch (error: any) {
-    return error;
+    throw error;
   }
 };
 
@@ -73,7 +74,7 @@ export const action = async ({ request }: any) => {
   try {
     return await auth.signOut(request);
   } catch (error) {
-    return "";
+    throw error;
   }
 };
 
@@ -110,7 +111,7 @@ const Document = withEmotionCache(
           <ChakraProvider theme={theme}>{children}</ChakraProvider>
           <ScrollRestoration />
           <Scripts />
-          {process.env.NODE_ENV === "development" ? <LiveReload /> : null}
+          <LiveReload />
         </body>
       </html>
     );

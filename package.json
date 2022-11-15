@@ -2,7 +2,7 @@
   "private": true,
   "sideEffects": false,
   "scripts": {
-    "clean": "rimraf node_modules",
+    "clean": "rimraf node_modules server .cache public/build",
     "build": "remix build",
     "dev:remix": "remix watch",
     "dev:arc": "cross-env NODE_ENV=development arc sandbox",
@@ -10,11 +10,8 @@
     "start": "cross-env NODE_ENV=production arc sandbox"
   },
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "^3.209.0",
-    "@aws-sdk/client-ses": "^3.209.0",
-    "@aws-sdk/lib-dynamodb": "^3.209.0",
-    "@chakra-ui/icons": "^2.0.11",
-    "@chakra-ui/react": "^2.3.7",
+    "@chakra-ui/icons": "^2.0.12",
+    "@chakra-ui/react": "^2.4.0",
     "@emotion/react": "^11.10.5",
     "@emotion/server": "^11.10.0",
     "@emotion/styled": "^11.10.5",

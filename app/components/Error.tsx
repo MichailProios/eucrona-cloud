@@ -9,6 +9,7 @@ interface ErrorProps {
 
 export default function Error({ error }: ErrorProps) {
   console.error(error.stack);
+
   return (
     <Container mt="5em">
       <VStack>

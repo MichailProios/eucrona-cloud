@@ -1,4 +1,4 @@
-import { ReactText, useEffect, useRef } from "react";
+import { useEffect, useRef, useContext } from "react";
 
 import {
   Flex,
@@ -30,12 +30,12 @@ import {
   useBoolean,
   SlideFade,
   Icon,
-  Link,
+  Link as ChakraLink,
 } from "@chakra-ui/react";
 
 import type { BoxProps, FlexProps } from "@chakra-ui/react";
 
-import { Form, NavLink, useLoaderData, useTransition } from "@remix-run/react";
+import { Form, NavLink, Link, useTransition } from "@remix-run/react";
 
 import {
   FiHome,
@@ -61,7 +61,8 @@ import {
 import LogoSideways from "public/logos/Logo-Sideways.svg";
 import LogoPlain from "public/logos/Logo-Plain.svg";
 import { useWindowDimensions } from "~/utils/hooks";
-import { IconType } from "react-icons/lib";
+import type { IconType } from "react-icons/lib";
+import { useLoaderData } from "@remix-run/react";
 
 interface LinkItemProps {
   name: string;
@@ -378,7 +379,7 @@ function Header({
 }
 
 function UserMenu() {
-  const { user } = useLoaderData();
+  const appData = useLoaderData();
 
   return (
     <>
@@ -393,14 +394,14 @@ function UserMenu() {
             transition="all 0.3s"
           >
             <HStack>
-              <Avatar size={"sm"} />
+              <Avatar size={"sm"} name={appData?.user.name} />
               <VStack
                 display={{ base: "none", md: "flex" }}
                 alignItems="flex-start"
                 spacing="1px"
                 ml="2"
               >
-                <Text fontSize="sm">{user.payload.name}</Text>
+                <Text fontSize="sm">{appData?.user.name}</Text>
                 <Text fontSize="xs" color="gray.600">
                   Basic User
                 </Text>
@@ -408,12 +409,23 @@ function UserMenu() {
             </HStack>
           </MenuButton>
 
-          <MenuList
-            bg={useColorModeValue("gray.50", "gray.900")}
-            boxShadow="md"
-          >
-            <MenuItem>Profile</MenuItem>
-            <MenuItem>Settings</MenuItem>
+          <MenuList boxShadow="md">
+            <MenuItem
+              as={Link}
+              to="/user/profile"
+              textDecoration="none"
+              _hover={{ textDecoration: "none" }}
+            >
+              Profile
+            </MenuItem>
+            <MenuItem
+              as={Link}
+              to="/user/settings"
+              textDecoration="none"
+              _hover={{ textDecoration: "none" }}
+            >
+              Settings
+            </MenuItem>
             <MenuDivider />
             <Form method="post" replace>
               <MenuItem type="submit">Sign out</MenuItem>
@@ -438,7 +450,7 @@ function UserMenu() {
                 spacing="1px"
                 ml="2"
               >
-                <Text fontSize="sm">{user.payload.name}</Text>
+                <Text fontSize="sm">{appData?.user.name}</Text>
                 <Text fontSize="xs" color="gray.600">
                   Basic User
                 </Text>
@@ -447,11 +459,25 @@ function UserMenu() {
           </MenuButton>
 
           <MenuList
-            bg={useColorModeValue("gray.50", "gray.900")}
+            // bg={useColorModeValue("gray.50", "gray.900")}
             boxShadow="md"
           >
-            <MenuItem>Profile</MenuItem>
-            <MenuItem>Settings</MenuItem>
+            <MenuItem
+              as={Link}
+              to="/user/profile"
+              textDecoration="none"
+              _hover={{ textDecoration: "none" }}
+            >
+              Profile
+            </MenuItem>
+            <MenuItem
+              as={Link}
+              to="/user/settings"
+              textDecoration="none"
+              _hover={{ textDecoration: "none" }}
+            >
+              Settings
+            </MenuItem>
             <MenuDivider />
             <Form method="post" replace>
               <MenuItem type="submit">Sign out</MenuItem>
@@ -572,11 +598,11 @@ function SidebarDrawer({
 
 interface NavItemProps extends FlexProps {
   icon: IconType;
-  children: ReactText;
+  children: any;
 }
 const NavItem = ({ icon, children, ...rest }: NavItemProps) => {
   return (
-    <Link href="#" style={{ textDecoration: "none" }}>
+    <ChakraLink href="#" style={{ textDecoration: "none" }}>
       <Flex
         align="center"
         p="4"
@@ -602,7 +628,7 @@ const NavItem = ({ icon, children, ...rest }: NavItemProps) => {
         )}
         {children}
       </Flex>
-    </Link>
+    </ChakraLink>
   );
 };
 
@@ -611,7 +637,7 @@ interface NavItemProps2 extends FlexProps {
 }
 const NavItem2 = ({ icon, children, ...rest }: NavItemProps2) => {
   return (
-    <Link href="#" style={{ textDecoration: "none" }}>
+    <ChakraLink href="#" style={{ textDecoration: "none" }}>
       <Flex
         align="center"
         p="4"
@@ -635,6 +661,6 @@ const NavItem2 = ({ icon, children, ...rest }: NavItemProps2) => {
           />
         )}
       </Flex>
-    </Link>
+    </ChakraLink>
   );
 };

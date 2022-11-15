@@ -1,4 +1,4 @@
-import { Fragment, ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useState, useContext } from "react";
 
 import {
   Fade,
@@ -31,6 +31,7 @@ import { ChevronUpIcon } from "@chakra-ui/icons";
 import { useLoaderData, useTransition } from "@remix-run/react";
 import * as auth from "app/utils/auth.server";
 import { LoaderFunction } from "@remix-run/node";
+import { useMatches } from "@remix-run/react";
 
 interface LayoutProps {
   children: ReactNode;
@@ -72,8 +73,9 @@ export default function Layout({ children }: LayoutProps) {
     }
   };
 
-  const loaderData = useLoaderData();
+  const appData = useLoaderData();
   const transition = useTransition();
+  const location = useMatches()[1];
 
   return (
     <Box
@@ -83,7 +85,14 @@ export default function Layout({ children }: LayoutProps) {
       flexDirection={"column"}
       justifyContent="flex-start"
     >
-      {loaderData?.isAuthenticated ? (
+      {appData?.isAuthenticated &&
+      ![
+        "/login",
+        "/register",
+        "/verify",
+        "/verify-identify",
+        "/two-factor",
+      ].includes(location?.pathname) ? (
         <>
           <Dashboard>
             {children}

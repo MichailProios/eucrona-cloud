@@ -1,16 +1,17 @@
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import { Text, Button, Center, Image, VStack } from "@chakra-ui/react";
+import { useDataRefresh } from "remix-utils";
 
-import type { LoaderFunction, MetaFunction } from "@remix-run/node";
+import { LoaderFunction, MetaFunction, redirect } from "@remix-run/node";
 
 import * as auth from "app/utils/auth.server";
-import { Link } from "@remix-run/react";
+import { useTransition } from "@remix-run/react";
 
 export const loader: LoaderFunction = async ({ request }: any) => {
   try {
     return await auth.protectedRoute(request);
   } catch (error) {
-    return error;
+    throw error;
   }
 };
 
@@ -20,15 +21,7 @@ export default function Index() {
       <Center display={"flex"} flexDirection="column">
         <VStack>
           <Text fontSize="xl"> Welcome to the Eucrona Cloud Dashboard </Text>
-          <Button
-            as={Link}
-            to={"/whoami"}
-            draggable="false"
-            prefetch="render"
-            colorScheme={"primary"}
-          >
-            Show Signed User Information
-          </Button>
+          <Button>test</Button>
         </VStack>
       </Center>
     </Fragment>

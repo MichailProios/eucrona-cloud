@@ -52,7 +52,11 @@ export const { getSession, commitSession, destroySession } =
 export async function isAuthenticated(request: Request) {
   const currentSession = await getSession(request.headers.get("Cookie"));
 
-  return currentSession.has("UserId") ? true : false;
+  if (currentSession.has("UserId")) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 export async function protectedRoute(request: Request) {
@@ -80,7 +84,7 @@ export async function getUser(request: Request) {
 
   const user = await currentSession.get("UserId");
 
-  return currentSession.has("UserId") ? user : null;
+  return currentSession.has("UserId") ? user.payload : null;
 }
 
 export async function signUp(
@@ -236,35 +240,3 @@ export async function signOut(request: any) {
     },
   });
 }
-
-// export async function getAttributes() {
-//   return new Promise(function (resolve, reject) {
-//     currentUser.getUserAttributes(function (err: any, attributes: any) {
-//       if (err) {
-//         reject(err);
-//       } else {
-//         resolve(attributes);
-//       }
-//     });
-//   }).catch((err) => {
-//     throw err;
-//   });
-// }
-
-// export async function setAttribute(attribute: any) {
-//   return new Promise(function (resolve, reject) {
-//     const attributeList = [];
-//     const res = new CognitoUserAttribute(attribute);
-//     attributeList.push(res);
-
-//     currentUser.updateAttributes(attributeList, (err: any, res: any) => {
-//       if (err) {
-//         reject(err);
-//       } else {
-//         resolve(res);
-//       }
-//     });
-//   }).catch((err) => {
-//     throw err;
-//   });
-// }
