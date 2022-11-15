@@ -415,6 +415,7 @@ function UserMenu() {
               to="/user/profile"
               textDecoration="none"
               _hover={{ textDecoration: "none" }}
+              draggable={false}
             >
               Profile
             </MenuItem>
@@ -423,6 +424,7 @@ function UserMenu() {
               to="/user/settings"
               textDecoration="none"
               _hover={{ textDecoration: "none" }}
+              draggable={false}
             >
               Settings
             </MenuItem>
@@ -467,6 +469,7 @@ function UserMenu() {
               to="/user/profile"
               textDecoration="none"
               _hover={{ textDecoration: "none" }}
+              draggable={false}
             >
               Profile
             </MenuItem>
@@ -475,6 +478,7 @@ function UserMenu() {
               to="/user/settings"
               textDecoration="none"
               _hover={{ textDecoration: "none" }}
+              draggable={false}
             >
               Settings
             </MenuItem>
