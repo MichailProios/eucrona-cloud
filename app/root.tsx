@@ -59,11 +59,13 @@ interface DocumentProps {
 export const loader: LoaderFunction = async ({ request }) => {
   try {
     const isAuthRes = await auth.isAuthenticated(request);
-    const userRes = await auth.getUser(request);
+    const user = await auth.getUser(request);
+
+    console.log(user);
 
     return {
       isAuthenticated: isAuthRes,
-      user: userRes,
+      user: user?.attributes,
     };
   } catch (error: any) {
     throw error;

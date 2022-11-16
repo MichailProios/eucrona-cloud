@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 
 import {
-  Container,
   FormControl,
   FormLabel,
   Input,
@@ -11,187 +10,56 @@ import {
   Avatar,
   AvatarBadge,
   Heading,
-  useColorModeValue,
   Center,
   InputGroup,
   InputRightElement,
-  Checkbox,
-  FormErrorMessage,
-  Textarea,
-  Divider,
-  Text,
-  Alert,
-  AlertIcon,
-  AlertTitle,
-  AlertDescription,
   SlideFade,
-  HStack,
   IconButton,
-  VStack,
   Badge,
 } from "@chakra-ui/react";
-
-import {
-  ValidatedForm,
-  validationError,
-  useIsSubmitting,
-  useField,
-} from "remix-validated-form";
 
 import { SmallCloseIcon } from "@chakra-ui/icons";
 import * as auth from "app/utils/auth.server";
 import type { LoaderFunction } from "@remix-run/node";
 import { useLoaderData, useActionData } from "@remix-run/react";
-import { withZod } from "@remix-validated-form/with-zod";
-import { z } from "zod";
-
-export const validator = withZod(
-  z.object({
-    firstName: z.string().min(1, { message: "First Name is required" }),
-    lastName: z.string().min(1, { message: "Last Name is required" }),
-
-    emailAddress: z
-      .string()
-      .min(1, { message: "Email Address is required" })
-      .email("Must be a valid email")
-      .trim(),
-
-    agreed: z.any(),
-  })
-);
 
 export const loader: LoaderFunction = async ({ request }) => {
   try {
     await auth.protectedRoute(request);
     const userRes = await auth.getUser(request);
 
-    return userRes;
+    return userRes?.attributes;
   } catch (error: any) {
     throw error;
   }
 };
 
-function TextField(props: any) {
-  const { error, getInputProps } = useField(props.name);
-  const isSubmitting = useIsSubmitting();
+export default function Profile() {
   const userData = useLoaderData();
 
-  const isEmailVerified = () => {
-    if (props.name === "emailAddress" && userData?.email_verified) {
+  const isVerifiedExists = (verified: boolean, exists: string) => {
+    if (!exists) {
+      return <Badge colorScheme="red">Not Provided</Badge>;
+    }
+
+    if (verified) {
       return <Badge colorScheme="green">Verified</Badge>;
+    } else {
+      return <Badge colorScheme="red">Not Verified</Badge>;
+    }
+  };
+
+  const exists = (exists: string) => {
+    if (!exists) {
+      return <Badge colorScheme="red">Not Provided</Badge>;
     }
   };
 
   return (
-    <FormControl id={props.name} isInvalid={error ? true : false}>
-      <FormLabel>
-        {props.label} {isEmailVerified()}
-      </FormLabel>
-      <Input {...props} {...getInputProps()} isReadOnly={isSubmitting} />
-      <FormErrorMessage>{error}</FormErrorMessage>
-    </FormControl>
-  );
-}
-
-function PasswordTextField(props: any) {
-  const { error, getInputProps } = useField(props.name);
-  const isSubmitting = useIsSubmitting();
-
-  return (
-    <FormControl id={props.name} isInvalid={error ? true : false}>
-      <FormLabel>{props.label}</FormLabel>
-      <InputGroup size="md">
-        <Input
-          {...props}
-          {...getInputProps()}
-          isReadOnly={isSubmitting}
-          type={"password"}
-        />
-      </InputGroup>
-      <FormErrorMessage>{error}</FormErrorMessage>
-    </FormControl>
-  );
-}
-
-// function CheckBox(props: any) {
-//   const { getInputProps } = useField(props.name);
-//   const isSubmitting = useIsSubmitting();
-
-//   return (
-//     <Checkbox
-//       {...props}
-//       {...getInputProps()}
-//       value={"yes"}
-//       isReadOnly={isSubmitting}
-//     >
-//       {props.label}
-//     </Checkbox>
-//   );
-// }
-
-function CheckBox(props: any) {
-  const { getInputProps } = useField(props.name);
-  const isSubmitting = useIsSubmitting();
-
-  return (
-    <Checkbox
-      {...props}
-      {...getInputProps()}
-      value={"yes"}
-      isReadOnly={isSubmitting}
-    >
-      {props.label}
-    </Checkbox>
-  );
-}
-
-function SubmitButton(props: any) {
-  const isSubmitting = useIsSubmitting();
-  const actionData = useActionData();
-
-  return (
-    <Button
-      {...props}
-      isLoading={isSubmitting}
-      loadingText="Creating Account"
-      // disabled={actionData === "success" || isSubmitting}
-    >
-      {props.label}
-    </Button>
-  );
-}
-
-export default function Profile() {
-  const userData = useLoaderData();
-
-  useEffect(() => {
-    console.log(userData);
-  }, [userData]);
-
-  return (
     <SlideFade in={true} reverse delay={0.1}>
-      <Flex
-        align={"center"}
-        justify={"center"}
-        p={6}
-        as={ValidatedForm}
-        validator={validator}
-        defaultValues={{
-          firstName: userData?.given_name,
-          lastName: userData?.family_name,
-          emailAddress: userData?.email,
-        }}
-        method="post"
-        id="registerForm"
-        replace
-      >
-        <Stack w="full">
-          <Heading
-            lineHeight={1.1}
-            fontSize={{ base: "xl", sm: "1xl" }}
-            my={2}
-            textAlign="center"
-          >
+      <Flex align={"center"} justify={"center"} p={6}>
+        <Stack w="full" spacing={4}>
+          <Heading lineHeight={1.1} fontSize={"2xl"} my={2} textAlign="center">
             User Profile
           </Heading>
 
@@ -218,45 +86,133 @@ export default function Profile() {
             </Center>
           </Stack>
 
-          <Stack direction={{ base: "column", md: "row" }} w="100%">
-            <TextField
-              label="First Name"
-              name="firstName"
-              placeholder="Enter your first name"
-              rounded="md"
-              type="text"
-            />
-            <TextField
-              label="Last Name"
-              name="lastName"
-              placeholder="Enter your last name"
-              rounded="md"
-              type="text"
-            />
-          </Stack>
+          <FormControl>
+            <FormLabel>Full Name</FormLabel>
+            <InputGroup size="md">
+              <Input
+                isReadOnly={true}
+                rounded="md"
+                type="text"
+                pr="5.3rem"
+                value={userData?.name}
+              />
+              <InputRightElement width="5.3rem">
+                <Button h="1.75rem" size="sm">
+                  Change
+                </Button>
+              </InputRightElement>
+            </InputGroup>
+          </FormControl>
 
-          <TextField
-            label="Email Address"
-            name="emailAddress"
-            placeholder="Enter your email"
-            rounded="md"
-            type="email"
-          />
+          <FormControl>
+            <FormLabel>
+              Email Address{" "}
+              {isVerifiedExists(userData?.email_verified, userData?.email)}
+            </FormLabel>
+            <InputGroup size="md">
+              <Input
+                isReadOnly={true}
+                rounded="md"
+                type="text"
+                pr="5.3rem"
+                value={userData?.email}
+              />
+              <InputRightElement width="5.3rem">
+                <Button h="1.75rem" size="sm">
+                  Change
+                </Button>
+              </InputRightElement>
+            </InputGroup>
+          </FormControl>
 
-          <TextField
-            label="Phone Number"
-            name="phoneNumber"
-            placeholder="Enter your phone number"
-            rounded="md"
-            type="tel"
-          />
+          <FormControl>
+            <FormLabel>
+              Phone Number{" "}
+              {isVerifiedExists(
+                userData?.phone_number_verified,
+                userData?.phone_number
+              )}
+            </FormLabel>
+            <InputGroup size="md">
+              <Input
+                isReadOnly={true}
+                rounded="md"
+                type="text"
+                placeholder={
+                  !userData?.phone_number ? `Click 'Add' to update` : ""
+                }
+                pr={
+                  userData?.phone_number && userData?.phone_number_verified
+                    ? "5.3rem"
+                    : !userData?.phone_number_verified
+                    ? "4.6rem"
+                    : "3.9rem"
+                }
+                value={userData?.phone_number}
+              />
+              <InputRightElement
+                width={
+                  userData?.phone_number && userData?.phone_number_verified
+                    ? "5.3rem"
+                    : !userData?.phone_number_verified
+                    ? "4.6rem"
+                    : "3.9rem"
+                }
+              >
+                <Button h="1.75rem" size="sm">
+                  {userData?.phone_number && userData?.phone_number_verified
+                    ? "Change"
+                    : !userData?.phone_number_verified
+                    ? "Verify"
+                    : "Add"}
+                </Button>
+              </InputRightElement>
+            </InputGroup>
+          </FormControl>
 
-          {/* {actionData?.res && (
-                  <Alert status="error" rounded="md">
-                    <AlertIcon />
-                    <AlertTitle>{actionData?.res?.message}</AlertTitle>
-                  </Alert>
-                )} */}
+          <FormControl>
+            <FormLabel>Date of Birth {exists(userData?.birthdate)}</FormLabel>
+            <InputGroup size="md">
+              <Input
+                isReadOnly={true}
+                rounded="md"
+                type="text"
+                placeholder={
+                  !userData?.birthdate ? `Click 'Add' to update` : ""
+                }
+                pr={userData?.birthdate ? "5.3rem" : "3.9rem"}
+                value={userData?.birthdate}
+              />
+              <InputRightElement
+                width={userData?.birthdate ? "5.3rem" : "3.9rem"}
+              >
+                <Button h="1.75rem" size="sm">
+                  {userData?.birthdate ? "Change" : "Add"}
+                </Button>
+              </InputRightElement>
+            </InputGroup>
+          </FormControl>
+
+          <FormControl>
+            <FormLabel>Address {exists(userData?.address)}</FormLabel>
+            <InputGroup size="md">
+              <Input
+                isReadOnly={true}
+                rounded="md"
+                type="text"
+                placeholder={!userData?.address ? `Click 'Add' to update` : ""}
+                pr={userData?.address ? "5.3rem" : "3.9rem"}
+                value={userData?.address}
+              />
+              <InputRightElement
+                width={userData?.address ? "5.3rem" : "3.9rem"}
+              >
+                <Button h="1.75rem" size="sm">
+                  {userData?.address ? "Change" : "Add"}
+                </Button>
+              </InputRightElement>
+            </InputGroup>
+          </FormControl>
         </Stack>
       </Flex>
     </SlideFade>

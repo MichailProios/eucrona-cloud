@@ -35,8 +35,10 @@ export default function User() {
     handleTabsChange(
       location?.pathname === "/user/profile"
         ? 0
-        : location?.pathname === "/user/settings"
+        : location?.pathname === "/user/security"
         ? 1
+        : location?.pathname === "/user/settings"
+        ? 2
         : undefined
     );
   }, [location?.pathname]);
@@ -45,7 +47,7 @@ export default function User() {
     <SlideFade in={true} reverse delay={0.1}>
       <Container maxW="3xl" p={{ base: 1, md: 10 }}>
         <Box
-          p={{ base: 5, sm: 10 }}
+          p={{ base: 1, sm: 10 }}
           bg={useColorModeValue("white", "gray.700")}
           rounded="xl"
           boxShadow={"2xl"}
@@ -67,6 +69,14 @@ export default function User() {
                 draggable={false}
               >
                 Profile
+              </Tab>
+              <Tab
+                as={Link}
+                to="/user/security"
+                _focus={{ boxShadow: "none" }}
+                draggable={false}
+              >
+                Security
               </Tab>
               <Tab
                 as={Link}

@@ -9,7 +9,9 @@ import { useTransition } from "@remix-run/react";
 
 export const loader: LoaderFunction = async ({ request }: any) => {
   try {
-    return await auth.protectedRoute(request);
+    await auth.protectedRoute(request);
+
+    return "";
   } catch (error) {
     throw error;
   }

@@ -381,6 +381,8 @@ function Header({
 function UserMenu() {
   const appData = useLoaderData();
 
+  console.log(appData);
+
   return (
     <>
       <Flex alignItems={"center"} display={{ base: "none", xs: "flex" }}>
@@ -421,6 +423,15 @@ function UserMenu() {
             </MenuItem>
             <MenuItem
               as={Link}
+              to="/user/security"
+              textDecoration="none"
+              _hover={{ textDecoration: "none" }}
+              draggable={false}
+            >
+              Security
+            </MenuItem>
+            <MenuItem
+              as={Link}
               to="/user/settings"
               textDecoration="none"
               _hover={{ textDecoration: "none" }}
@@ -445,7 +456,7 @@ function UserMenu() {
             transition="all 0.3s"
           >
             <HStack>
-              <Avatar size={"sm"} />
+              <Avatar size={"sm"} name={appData?.user.name} />
               <VStack
                 display={{ base: "none", md: "flex" }}
                 alignItems="flex-start"
@@ -472,6 +483,15 @@ function UserMenu() {
               draggable={false}
             >
               Profile
+            </MenuItem>
+            <MenuItem
+              as={Link}
+              to="/user/security"
+              textDecoration="none"
+              _hover={{ textDecoration: "none" }}
+              draggable={false}
+            >
+              Security
             </MenuItem>
             <MenuItem
               as={Link}
