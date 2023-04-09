@@ -1,41 +1,28 @@
-# Welcome to Remix!
+# Create T3 App
 
-- [Remix Docs](https://remix.run/docs)
+This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
 
-## Development
+## What's next? How do I make an app with this?
 
-The following command will run two processes during development when using Architect as your server.
+We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
 
-- Your Architect server sandbox
-- The Remix development server
+If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
 
-```sh
-$ npm run dev
-```
+- [Next.js](https://nextjs.org)
+- [NextAuth.js](https://next-auth.js.org)
+- [Prisma](https://prisma.io)
+- [Tailwind CSS](https://tailwindcss.com)
+- [tRPC](https://trpc.io)
 
-Your file changes are watched, and assets are rebuilt upon change.
+## Learn More
 
-Open up [http://localhost:3333](http://localhost:3333) and you should be ready to go!
+To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
 
-## Deploying
+- [Documentation](https://create.t3.gg/)
+- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
 
-Before you can deploy, you'll need to do some setup with AWS:
+You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
 
-- First [install the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
-- Then [follow the Architect setup instructions](https://arc.codes/docs/en/guides/get-started/detailed-aws-setup).
+## How do I deploy this?
 
-If you make it through all of that, you're ready to deploy!
-
-1. build the app for production:
-
-   ```sh
-   npm run build
-   ```
-
-2. Deploy with `arc`
-
-   ```sh
-   arc deploy production
-   ```
-
-You're in business!
+Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
